@@ -1118,6 +1118,9 @@
   </main>
 </div>
 
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+
 <script>
 (function(){
   'use strict';
@@ -1411,13 +1414,39 @@
     }
   }
 
-  // ---- db ----
+    // ---- db ----
+  // Firebase project: sappun-knee-rom (Firestore, asia-northeast3/Seoul).
+  // Used only as a fallback when this page is NOT running inside a Claude
+  // Artifact (e.g. the GitHub-hosted standalone copy), since window.claude.use('db')
+  // is a Claude-Artifact-only capability. firebase.firestore() (compat SDK) exposes
+  // the same doc()/collection()/get()/set()/add()/where()/orderBy()/limit() shape
+  // used throughout this file, so no extra adapter layer is needed.
+  var FIREBASE_CONFIG = {
+    apiKey: "AIzaSyDjTtt-E7c6uEy5nCqwxg4YjoD-4mkUTkc",
+    authDomain: "sappun-knee-rom.firebaseapp.com",
+    projectId: "sappun-knee-rom",
+    storageBucket: "sappun-knee-rom.firebasestorage.app",
+    messagingSenderId: "754059108746",
+    appId: "1:754059108746:web:c65d545a8b32f056d82873"
+  };
+  function ensureFirebaseDb(){
+    try {
+      if (!window.firebase || !window.firebase.initializeApp) return null;
+      if (!firebase.apps || !firebase.apps.length) {
+        firebase.initializeApp(FIREBASE_CONFIG);
+      }
+      return firebase.firestore();
+    } catch (e) {
+      return null;
+    }
+  }
+
   var dbPromise = null;
   function ensureDb(){
     if (!dbPromise) {
       dbPromise = (window.claude && window.claude.use)
-        ? window.claude.use('db').catch(function(){ return null; })
-        : Promise.resolve(null);
+        ? window.claude.use('db').then(function(store){ return store || ensureFirebaseDb(); }).catch(function(){ return ensureFirebaseDb(); })
+        : Promise.resolve(ensureFirebaseDb());
     }
     return dbPromise;
   }

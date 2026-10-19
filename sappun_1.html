@@ -1,0 +1,2492 @@
+<title>사뿐</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Gowun+Dodum&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  /* layout: one centered phone-width app shell; soft low-opacity blobs drift
+     behind it like the soft give of a step landing lightly ("사뿐") */
+  :root{
+    --bg: hsl(42 38% 96%);
+    --surface: hsl(40 48% 99%);
+    --surface-2: hsl(38 32% 91%);
+    --ink: hsl(28 24% 15%);
+    --ink-soft: hsl(28 14% 40%);
+    --accent: hsl(168 40% 30%);
+    --accent-strong: hsl(168 46% 24%);
+    --accent-soft: hsl(168 36% 90%);
+    --accent-ink: hsl(168 50% 14%);
+    --highlight: hsl(14 58% 50%);
+    --highlight-soft: hsl(16 62% 93%);
+    --border: hsl(32 22% 83%);
+    --shadow: 28 20% 20%;
+    --font-display: 'Gowun Batang', 'Noto Serif KR', serif;
+    --font-body: 'Gowun Dodum', 'Noto Sans KR', sans-serif;
+    --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, monospace;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg: hsl(190 24% 9%);
+      --surface: hsl(190 20% 13%);
+      --surface-2: hsl(190 18% 17%);
+      --ink: hsl(40 32% 94%);
+      --ink-soft: hsl(40 14% 70%);
+      --accent: hsl(166 46% 58%);
+      --accent-strong: hsl(166 50% 68%);
+      --accent-soft: hsl(166 30% 19%);
+      --accent-ink: hsl(166 55% 92%);
+      --highlight: hsl(16 72% 66%);
+      --highlight-soft: hsl(16 40% 20%);
+      --border: hsl(190 16% 24%);
+      --shadow: 190 40% 2%;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg: hsl(190 24% 9%);
+    --surface: hsl(190 20% 13%);
+    --surface-2: hsl(190 18% 17%);
+    --ink: hsl(40 32% 94%);
+    --ink-soft: hsl(40 14% 70%);
+    --accent: hsl(166 46% 58%);
+    --accent-strong: hsl(166 50% 68%);
+    --accent-soft: hsl(166 30% 19%);
+    --accent-ink: hsl(166 55% 92%);
+    --highlight: hsl(16 72% 66%);
+    --highlight-soft: hsl(16 40% 20%);
+    --border: hsl(190 16% 24%);
+    --shadow: 190 40% 2%;
+    color-scheme: dark;
+  }
+
+  *{ box-sizing: border-box; }
+  body{
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-body);
+    min-height: 100%;
+  }
+
+  .app-shell{
+    position: relative;
+    max-width: 440px;
+    margin: 0 auto;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    padding-block: 20px 48px;
+    overflow: hidden;
+  }
+
+  .blob{
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(38px);
+    opacity: .55;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .blob-a{
+    width: 220px; height: 220px;
+    top: -60px; right: -70px;
+    background: radial-gradient(circle, var(--accent-soft), transparent 70%);
+  }
+  .blob-b{
+    width: 180px; height: 180px;
+    top: 320px; left: -80px;
+    background: radial-gradient(circle, var(--highlight-soft), transparent 70%);
+  }
+
+  .topbar{
+    position: sticky;
+    top: env(safe-area-inset-top, 0px);
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-block: 10px;
+    margin-bottom: 8px;
+    background: var(--bg);
+  }
+  .topbar .wordmark-small{
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: var(--accent-strong);
+    flex: 1;
+  }
+  .icon-btn{
+    appearance: none;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--ink);
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    line-height: 1;
+    cursor: pointer;
+  }
+  .icon-btn:focus-visible, button:focus-visible, input:focus-visible{
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+  .code-chip{
+    font-family: var(--font-mono);
+    font-size: .78rem;
+    letter-spacing: .04em;
+    background: var(--accent-soft);
+    color: var(--accent-ink);
+    padding: 5px 10px;
+    border-radius: 999px;
+  }
+
+  .stage{ position: relative; z-index: 1; }
+  .view{ display: flex; flex-direction: column; gap: 22px; }
+
+  /* ---- start view ---- */
+  .hero{
+    text-align: center;
+    padding-block: 56px 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+  .hero .mark{
+    width: 72px; height: 72px;
+    border-radius: 28px;
+    background: linear-gradient(155deg, var(--accent-soft), var(--surface));
+    border: 1px solid var(--border);
+    display: grid;
+    place-items: center;
+    font-size: 1.9rem;
+  }
+  .hero h1{
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 2.6rem;
+    margin: 0;
+    color: var(--accent-strong);
+  }
+  .hero p{
+    margin: 0;
+    color: var(--ink-soft);
+    font-size: .98rem;
+    max-width: 30ch;
+  }
+
+  .btn-col{ display: flex; flex-direction: column; gap: 10px; margin-top: 8px; }
+
+  button.btn{
+    appearance: none;
+    border: none;
+    border-radius: 999px;
+    padding: 14px 20px;
+    font-family: var(--font-body);
+    font-size: 1rem;
+    font-weight: 400;
+    cursor: pointer;
+    min-height: 48px;
+    width: 100%;
+    transition: transform .12s ease, opacity .12s ease;
+  }
+  button.btn:active{ transform: scale(.98); }
+  button.btn:disabled{ opacity: .5; cursor: not-allowed; }
+  .btn-primary{ background: var(--accent); color: var(--surface); box-shadow: 0 10px 24px -14px hsl(var(--shadow) / .6); }
+  .btn-secondary{ background: var(--surface); color: var(--ink); border: 1px solid var(--border); }
+  .btn-ghost{ background: transparent; color: var(--accent-strong); border: 1px dashed var(--border); }
+
+  /* ---- generic card / heading pieces ---- */
+  .eyebrow{
+    font-size: .78rem;
+    letter-spacing: .08em;
+    color: var(--accent-strong);
+    font-weight: 500;
+  }
+  h2.view-title{
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    margin: 2px 0 0;
+    color: var(--ink);
+    text-wrap: balance;
+  }
+  p.lede{ color: var(--ink-soft); margin: 0; line-height: 1.6; }
+
+  .card{
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 18px;
+  }
+
+  /* ---- signup ---- */
+  .code-display{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 28px 16px;
+    border-radius: 18px;
+    background: var(--highlight-soft);
+    border: 1px solid var(--border);
+  }
+  .code-display .label{ font-size: .8rem; color: var(--ink-soft); }
+  .code-display .code{
+    font-family: var(--font-mono);
+    font-size: 2rem;
+    font-weight: 500;
+    letter-spacing: .14em;
+    color: var(--highlight);
+    font-variant-numeric: tabular-nums;
+  }
+  .copy-row{ display: flex; gap: 8px; }
+  .copy-row button{ width: auto; flex: 0 0 auto; padding: 8px 16px; font-size: .85rem; min-height: 36px; }
+  .hint{ font-size: .85rem; color: var(--ink-soft); line-height: 1.55; }
+  .hint strong{ color: var(--ink); }
+
+  /* ---- login ---- */
+  .field{ display: flex; flex-direction: column; gap: 6px; }
+  .field label{ font-size: .85rem; color: var(--ink-soft); }
+  .field input{
+    font-family: var(--font-mono);
+    font-size: 1.15rem;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    padding: 13px 14px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--ink);
+  }
+  .field input::placeholder{ font-family: var(--font-body); letter-spacing: normal; text-transform: none; color: var(--ink-soft); opacity: .7; }
+  .error-text{ color: var(--highlight); font-size: .85rem; }
+
+  /* ---- profile intake ---- */
+  .sub-label{
+    font-size: .74rem;
+    font-weight: 400;
+    color: var(--ink-soft);
+    margin-left: 6px;
+  }
+  .segmented{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .segmented input[type="radio"]{
+    position: absolute;
+    opacity: 0;
+    width: 1px; height: 1px;
+    pointer-events: none;
+  }
+  .segment{
+    flex: 1 1 auto;
+    text-align: center;
+    padding: 11px 12px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--ink);
+    font-size: .92rem;
+    line-height: 1.35;
+    cursor: pointer;
+    user-select: none;
+  }
+  .segmented input[type="radio"]:checked + .segment{
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--surface);
+  }
+  .segmented input[type="radio"]:focus-visible + .segment{
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+  .field input.plain-input{
+    font-family: var(--font-body);
+    font-size: 1rem;
+    letter-spacing: normal;
+    text-transform: none;
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--ink);
+    width: 100%;
+  }
+  .age-preview{ font-size: .85rem; color: var(--accent-strong); }
+
+  /* ---- space intro ---- */
+  .method-list{ list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+  .method-list li{
+    display: flex; gap: 12px; align-items: flex-start;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 16px; padding: 14px 16px;
+  }
+  .method-list .num{
+    font-family: var(--font-mono);
+    color: var(--accent-strong);
+    background: var(--accent-soft);
+    border-radius: 999px;
+    width: 26px; height: 26px;
+    display: grid; place-items: center;
+    font-size: .82rem;
+    flex: none;
+  }
+  .method-list .text{ line-height: 1.55; padding-top: 2px; }
+
+  /* ---- instructions ---- */
+  ol.steps{
+    list-style: none;
+    counter-reset: step;
+    margin: 0; padding: 0;
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  ol.steps li{
+    counter-increment: step;
+    position: relative;
+    padding-left: 34px;
+    line-height: 1.6;
+    color: var(--ink);
+  }
+  ol.steps li::before{
+    content: counter(step) ")";
+    position: absolute; left: 0; top: 0;
+    font-family: var(--font-mono);
+    color: var(--accent-strong);
+    font-size: .92rem;
+  }
+
+  /* ---- device demo ---- */
+  .device-card{
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 18px;
+    display: flex; flex-direction: column; gap: 14px;
+  }
+  .device-status-row{ display: flex; align-items: center; gap: 10px; }
+  .pulse-dot{
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--accent);
+    animation: pulse 1.4s ease-in-out infinite;
+    flex: none;
+  }
+  @media (prefers-reduced-motion: reduce){ .pulse-dot{ animation: none; } }
+  @keyframes pulse{
+    0%, 100% { opacity: .4; transform: scale(.85); }
+    50% { opacity: 1; transform: scale(1.05); }
+  }
+  #device-status{ font-size: .95rem; color: var(--ink); }
+  .readout{
+    font-family: var(--font-mono);
+    font-size: .88rem;
+    color: var(--accent-strong);
+    background: var(--accent-soft);
+    border-radius: 10px;
+    padding: 10px 12px;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+  .demo-note{
+    font-size: .8rem;
+    color: var(--ink-soft);
+    border-top: 1px dashed var(--border);
+    padding-top: 10px;
+    line-height: 1.5;
+  }
+  .inline-note{
+    font-size: .85rem;
+    color: var(--accent-strong);
+    background: var(--accent-soft);
+    border-radius: 12px;
+    padding: 10px 12px;
+    line-height: 1.5;
+  }
+
+  /* ---- guided instruction carousel ---- */
+  .step-progress{
+    display: flex;
+    gap: 6px;
+  }
+  .step-progress span{
+    flex: 1;
+    height: 4px;
+    border-radius: 999px;
+    background: var(--border);
+  }
+  .step-progress span.done{ background: var(--accent); }
+  .step-card{
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 22px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .step-card .step-num{
+    font-family: var(--font-mono);
+    font-size: .8rem;
+    color: var(--accent-strong);
+  }
+  .step-card p{
+    margin: 0;
+    line-height: 1.65;
+    color: var(--ink);
+    font-size: 1rem;
+  }
+  .step-figure{
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+  .step-figure svg{ width: 100%; max-width: 260px; height: auto; color: var(--ink-soft); }
+  .step-figure .accent-part{ color: var(--accent); }
+  .step-figure figcaption{
+    font-size: .78rem;
+    color: var(--ink-soft);
+    text-align: center;
+  }
+  .step-nav{ display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .step-nav-prev{
+    appearance: none; border: none; background: transparent;
+    color: var(--ink-soft); font-family: var(--font-body);
+    font-size: .88rem; cursor: pointer; padding: 8px 2px;
+  }
+  .step-nav-prev:disabled{ visibility: hidden; }
+  .step-nav-next{
+    appearance: none; border: none; border-radius: 999px;
+    background: var(--accent); color: var(--surface);
+    width: 48px; height: 48px; font-size: 1.2rem;
+    cursor: pointer; flex: none;
+    display: grid; place-items: center;
+  }
+
+  /* ---- live measurement ---- */
+  .signal-card{
+    background: var(--accent-soft);
+    border-radius: 20px;
+    padding: 36px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    text-align: center;
+  }
+  .signal-card .signal-text{
+    font-family: var(--font-display);
+    font-size: 1.7rem;
+    font-weight: 700;
+    color: var(--accent-ink);
+  }
+  .signal-ring{
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    border: 4px solid var(--border);
+    border-top-color: var(--accent);
+    animation: spin 1.8s linear infinite;
+  }
+  @media (prefers-reduced-motion: reduce){ .signal-ring{ animation: none; } }
+  @keyframes spin{ to{ transform: rotate(360deg); } }
+  .signal-progress{ font-family: var(--font-mono); font-size: .82rem; color: var(--accent-strong); }
+  .assist-note{ font-size: .82rem; color: var(--ink-soft); line-height: 1.55; }
+  .complete-banner{
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 16px;
+    text-align: center;
+    color: var(--ink);
+    line-height: 1.6;
+  }
+
+  /* ---- result ---- */
+  .result-tile{
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 32px 20px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .result-tile .result-label{ font-size: .85rem; color: var(--ink-soft); }
+  .result-tile .result-value{
+    font-family: var(--font-display);
+    font-size: 3rem;
+    font-weight: 700;
+    color: var(--accent-strong);
+    font-variant-numeric: tabular-nums;
+  }
+  .result-tile .result-caption{ font-size: .82rem; color: var(--ink-soft); }
+  .next-method-btn{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    text-align: left;
+  }
+  .next-method-btn .label-top{ font-size: .78rem; opacity: .85; }
+  .next-method-btn .label-main{ font-size: 1rem; }
+
+  /* ---- space home (returning users) ---- */
+  .welcome-note{ font-size: .9rem; color: var(--ink-soft); }
+
+  /* ---- history chart ---- */
+  .chart-wrap{
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 16px 12px;
+    overflow-x: auto;
+  }
+  .chart-wrap svg{ display: block; min-width: 100%; }
+  .chart-line{ fill: none; stroke: var(--accent); stroke-width: 2; }
+  .chart-zero-line{ stroke: var(--border); stroke-width: 1; stroke-dasharray: 3 4; }
+  .chart-grid-label{ fill: var(--ink-soft); font-size: 9px; font-family: var(--font-mono); }
+  .chart-date-label{ fill: var(--ink-soft); font-size: 9px; font-family: var(--font-mono); }
+  .chart-value-label{ fill: var(--ink); font-size: 10px; font-family: var(--font-mono); font-weight: 500; }
+  .chart-point{ fill: var(--surface); stroke: var(--accent); stroke-width: 2; cursor: pointer; }
+  .chart-point.selected{ fill: var(--accent); }
+  .chart-hit{ fill: transparent; cursor: pointer; }
+  .detail-card{
+    background: var(--accent-soft);
+    border-radius: 16px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .detail-card .detail-date{ font-family: var(--font-mono); font-size: .8rem; color: var(--accent-strong); }
+  .detail-card .detail-row{ display: flex; justify-content: space-between; font-size: .92rem; color: var(--accent-ink); }
+  .detail-card .detail-row span:last-child{ font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+  .empty-state{
+    background: var(--surface);
+    border: 1px dashed var(--border);
+    border-radius: 16px;
+    padding: 24px 18px;
+    text-align: center;
+    color: var(--ink-soft);
+    font-size: .92rem;
+    line-height: 1.6;
+  }
+
+  /* ---- 체조 금지 경고 ---- */
+  .warning-list{ list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+  .warning-item{
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--highlight);
+    border-radius: 12px;
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .warning-item .cond{ font-weight: 700; color: var(--ink); line-height: 1.5; }
+  .warning-item .advice{ font-size: .88rem; color: var(--ink-soft); line-height: 1.55; }
+  .warning-banner{
+    background: var(--highlight-soft);
+    border-radius: 14px;
+    padding: 12px 14px;
+    font-size: .85rem;
+    color: var(--accent-ink);
+    line-height: 1.55;
+  }
+
+  /* ---- 통증 강도 슬라이더 ---- */
+  .slider-field{ display: flex; flex-direction: column; gap: 10px; }
+  .slider-field input[type="range"]{
+    width: 100%;
+    accent-color: var(--accent);
+    height: 28px;
+  }
+  .slider-ticks{
+    display: flex;
+    justify-content: space-between;
+    font-size: .76rem;
+    color: var(--ink-soft);
+  }
+  .slider-ticks span{ flex: 1; text-align: center; }
+  .slider-ticks span:first-child{ text-align: left; }
+  .slider-ticks span:last-child{ text-align: right; }
+  .severity-banner{
+    border-radius: 16px;
+    padding: 18px 16px;
+    font-weight: 700;
+    font-size: 1.05rem;
+    line-height: 1.6;
+    text-align: center;
+    background: var(--accent-soft);
+    color: var(--accent-ink);
+  }
+  .severity-banner.severe{ background: var(--highlight-soft); color: var(--highlight); }
+
+  /* ---- 유형 진단 워크스루 (안내 캐러셀과 스타일 공유) ---- */
+  .test-category-label{ font-family: var(--font-mono); font-size: .78rem; color: var(--accent-strong); }
+  .test-move{ font-family: var(--font-display); font-size: 1.3rem; font-weight: 700; color: var(--ink); margin: 0; }
+
+  /* ---- 나의 통증 유형은? ---- */
+  .type-group{ display: flex; flex-direction: column; gap: 8px; }
+  .type-group-title{ font-size: .82rem; color: var(--ink-soft); font-weight: 500; margin-top: 6px; }
+  .type-option{ position: absolute; opacity: 0; width: 1px; height: 1px; pointer-events: none; }
+  .type-option-label{
+    display: block;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 14px;
+    cursor: pointer;
+    font-size: .95rem;
+    color: var(--ink);
+  }
+  .type-option:checked + .type-option-label{
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--surface);
+    font-weight: 500;
+  }
+  .type-option:focus-visible + .type-option-label{ outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  /* ---- 스트레칭 추천 결과 ---- */
+  .big-instructions{ font-size: 1.08rem; line-height: 1.85; color: var(--ink); }
+  .big-instructions ol{ margin: 0; padding-left: 1.3em; display: flex; flex-direction: column; gap: 10px; }
+  .variant-block{
+    border-top: 1px dashed var(--border);
+    padding-top: 14px;
+    margin-top: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .variant-block .variant-title{ font-weight: 700; color: var(--accent-strong); font-size: 1rem; }
+  .variant-block .variant-sub{ font-size: .82rem; color: var(--ink-soft); }
+  .caution-line{
+    font-size: .88rem;
+    color: var(--accent-ink);
+    background: var(--accent-soft);
+    border-radius: 10px;
+    padding: 10px 12px;
+    line-height: 1.55;
+  }
+  .caution-line.severe{ background: var(--highlight-soft); color: var(--highlight); font-weight: 700; }
+
+  .btn-row{ display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; }
+  .btn-row .btn{ flex: 1 1 140px; width: auto; }
+  .alarm-status{
+    font-size: .85rem;
+    color: var(--ink-soft);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 12px;
+    line-height: 1.55;
+    text-align: center;
+  }
+  .alarm-status.active{ background: var(--accent-soft); color: var(--accent-ink); border-color: transparent; }
+  .alarm-status.error{ background: var(--highlight-soft); color: var(--highlight); border-color: transparent; }
+
+  @media (max-width: 380px){
+    .hero h1{ font-size: 2.2rem; }
+    .code-display .code{ font-size: 1.6rem; letter-spacing: .1em; }
+  }
+</style>
+
+<div class="app-shell" id="app">
+  <div class="blob blob-a" aria-hidden="true"></div>
+  <div class="blob blob-b" aria-hidden="true"></div>
+
+  <header class="topbar" id="topbar" hidden>
+    <button class="icon-btn" id="btn-back" aria-label="뒤로가기" type="button">←</button>
+    <span class="wordmark-small">사뿐</span>
+    <span class="code-chip" id="header-code-chip" hidden></span>
+  </header>
+
+  <main class="stage">
+
+    <!-- 시작 화면 -->
+    <section class="view" id="view-start">
+      <div class="hero">
+        <div class="mark" aria-hidden="true">🦵</div>
+        <h1>사뿐</h1>
+        <p>가볍게 디뎌도 괜찮은 무릎을 위해, 내 상태를 먼저 알아봐요.</p>
+      </div>
+      <div class="btn-col">
+        <button class="btn btn-primary" id="btn-go-login" type="button">로그인</button>
+        <button class="btn btn-secondary" id="btn-go-signup-start" type="button">신규 사용자</button>
+      </div>
+    </section>
+
+    <!-- 신규 사용자: 코드 발급 -->
+    <section class="view" id="view-signup" hidden>
+      <div>
+        <div class="eyebrow">신규 사용자</div>
+        <h2 class="view-title">개인 코드를 발급할게요</h2>
+        <p class="lede">이 코드로 사뿐이 회원님의 기록을 저장하고, 다음에 다시 찾아올 수 있도록 해줘요.</p>
+      </div>
+
+      <p id="signup-status" class="hint">코드를 만들고 있어요…</p>
+
+      <div class="code-display" id="signup-code" hidden>
+        <span class="label">회원님의 개인 코드</span>
+        <span class="code" id="signup-code-text">0000000</span>
+        <div class="copy-row">
+          <button class="btn btn-ghost" id="btn-copy-code" type="button">코드 복사</button>
+        </div>
+      </div>
+
+      <p class="hint" id="signup-hint" hidden><strong>이 코드를 꼭 기억하거나 적어두세요.</strong> 다음에 로그인할 때 이 코드가 필요해요. 아래에서 기본 정보 입력까지 마쳐야 이 코드로 기록이 저장돼요 — 정보를 입력하지 않으면 코드는 저장되지 않고, 나중에 다른 사람이 다시 받을 수 있어요.</p>
+
+      <button class="btn btn-primary" id="btn-enter-space" type="button" hidden>나의 무릎 알아보기</button>
+    </section>
+
+    <!-- 로그인 -->
+    <section class="view" id="view-login" hidden>
+      <div>
+        <div class="eyebrow">로그인</div>
+        <h2 class="view-title">개인 코드를 입력해주세요</h2>
+        <p class="lede">신규 사용자로 등록할 때 받았던 7자리 코드예요.</p>
+      </div>
+
+      <div class="field">
+        <label for="login-input">개인 코드 입력칸</label>
+        <input id="login-input" type="text" inputmode="text" maxlength="7" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="예: 3F7K9QA">
+      </div>
+      <p class="error-text" id="login-error" hidden></p>
+
+      <button class="btn btn-primary" id="btn-submit-login" type="button">입장하기</button>
+    </section>
+
+    <!-- 기본 정보 입력 (최초 1회) -->
+    <section class="view" id="view-profile" hidden>
+      <div>
+        <div class="eyebrow">처음이시네요</div>
+        <h2 class="view-title">무릎 상태를 더 정확히 예측하려면 몇 가지가 필요해요</h2>
+        <p class="lede">입력한 정보는 회원님의 코드와 함께 계속 저장되고, 다음에 다시 올 때도 그대로 남아 있어요.</p>
+      </div>
+
+      <p class="error-text" id="profile-error" hidden></p>
+
+      <div class="field">
+        <label for="profile-birthyear">나이</label>
+        <input class="plain-input" id="profile-birthyear" type="number" inputmode="numeric" placeholder="태어난 연도 (예: 2010)">
+        <p class="age-preview" id="age-preview" hidden></p>
+      </div>
+
+      <div class="field">
+        <label>성별<span class="sub-label">생물학적 성별</span></label>
+        <div class="segmented" role="radiogroup" aria-label="성별">
+          <input type="radio" name="profile-sex" id="sex-male" value="male">
+          <label class="segment" for="sex-male">남성</label>
+          <input type="radio" name="profile-sex" id="sex-female" value="female">
+          <label class="segment" for="sex-female">여성</label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>인공관절 수술 여부</label>
+        <div class="segmented" role="radiogroup" aria-label="인공관절 수술 여부">
+          <input type="radio" name="profile-joint" id="joint-no" value="no">
+          <label class="segment" for="joint-no">없음</label>
+          <input type="radio" name="profile-joint" id="joint-yes" value="yes">
+          <label class="segment" for="joint-yes">있음</label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>평발 여부</label>
+        <div class="segmented" role="radiogroup" aria-label="평발 여부">
+          <input type="radio" name="profile-flatfeet" id="flatfeet-no" value="no">
+          <label class="segment" for="flatfeet-no">없음</label>
+          <input type="radio" name="profile-flatfeet" id="flatfeet-yes" value="yes">
+          <label class="segment" for="flatfeet-yes">있음</label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>O자 / X자 다리 여부</label>
+        <div class="segmented" role="radiogroup" aria-label="O자 X자 다리 여부">
+          <input type="radio" name="profile-leg" id="leg-none" value="none">
+          <label class="segment" for="leg-none">없음</label>
+          <input type="radio" name="profile-leg" id="leg-o" value="o">
+          <label class="segment" for="leg-o">O자 다리<br><span class="sub-label">내반슬</span></label>
+          <input type="radio" name="profile-leg" id="leg-x" value="x">
+          <label class="segment" for="leg-x">X자 다리<br><span class="sub-label">외반슬</span></label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>일자 허리 여부</label>
+        <div class="segmented" role="radiogroup" aria-label="일자 허리 여부">
+          <input type="radio" name="profile-flatback" id="flatback-no" value="no">
+          <label class="segment" for="flatback-no">없음</label>
+          <input type="radio" name="profile-flatback" id="flatback-yes" value="yes">
+          <label class="segment" for="flatback-yes">있음</label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="profile-conditions">지병 여부</label>
+        <input class="plain-input" id="profile-conditions" type="text" autocomplete="off" placeholder="없으면 비워두세요">
+        <p class="hint">근골격계와 관련된 질환이면 입력해주세요. (예: 골다공증, 파킨슨병 등)</p>
+      </div>
+
+      <button class="btn btn-primary" id="btn-save-profile" type="button">저장하고 계속하기</button>
+    </section>
+
+    <!-- 개인 스페이스 인트로 -->
+    <section class="view" id="view-space-intro" hidden>
+      <div>
+        <div class="eyebrow">내 스페이스</div>
+        <h2 class="view-title">내 무릎 상태, 두 가지로 알아봐요</h2>
+        <p class="lede">사뿐은 아래 두 가지 방법을 함께 사용해서 무릎 통증의 원인을 예측해요.</p>
+      </div>
+
+      <ul class="method-list">
+        <li>
+          <span class="num">1</span>
+          <span class="text">간이 무릎 상태 측정기로 내 무릎의 상태 예측하기</span>
+        </li>
+        <li>
+          <span class="num">2</span>
+          <span class="text">통증 내비 체조를 통한 내 무릎 통증 유형 예측하기</span>
+        </li>
+      </ul>
+
+      <button class="btn btn-primary" id="btn-start-measuring" type="button">측정 시작하기</button>
+    </section>
+
+    <!-- 측정 1단계: 착용 안내 -->
+    <section class="view" id="view-measure-instructions" hidden>
+      <div>
+        <div class="eyebrow">1 · 간이 무릎 상태 측정기</div>
+        <h2 class="view-title">간이 무릎 상태 측정기로 내 무릎의 상태 예측하기</h2>
+      </div>
+
+      <div class="card">
+        <ol class="steps">
+          <li>의자에 앉은 후 무릎 측정기를 착용합니다. 동그란 무릎 부분을 무릎뼈 중앙에 맞춘 후, 끈을 세게 잡아당겨서 무릎에 단단히 고정합니다.</li>
+          <li>무릎 보호대와 다리 사이 공간이 최대한 적게 생기도록 장치를 밀착합니다.</li>
+          <li>센서를 무릎뼈 위와 아래 알맞은 위치에 부착합니다. 무릎뼈 가장 위와 아래가 좋습니다.</li>
+          <li>'측정 시작하기' 버튼을 누릅니다.</li>
+        </ol>
+      </div>
+
+      <button class="btn btn-primary" id="btn-begin-device" type="button">측정 시작하기</button>
+    </section>
+
+    <!-- 측정기 작동 / 신전 범위 측정 진입 -->
+    <section class="view" id="view-measure-device" hidden>
+      <div>
+        <div class="eyebrow">1 · 간이 무릎 상태 측정기</div>
+        <h2 class="view-title">측정기와 연결하고 있어요</h2>
+      </div>
+
+      <div class="device-card">
+        <div class="device-status-row">
+          <span class="pulse-dot" aria-hidden="true"></span>
+          <span id="device-status">측정기에 연결하는 중…</span>
+        </div>
+        <div class="readout" id="device-readout" hidden></div>
+        <p class="demo-note">지금은 데모 화면이에요. 실제 ROM 측정기(허벅지·정강이 IMU 센서)와의 연동은 다음 단계에서 이어서 구현돼요.</p>
+      </div>
+
+      <button class="btn btn-primary" id="btn-measure-extension" type="button" hidden>신전 가능 범위 측정하기</button>
+    </section>
+
+    <!-- 신전 범위 측정: 안내문 캐러셀 -->
+    <section class="view" id="view-measure-guide" hidden>
+      <div>
+        <div class="eyebrow">1 · 신전 가능 범위 측정</div>
+        <h2 class="view-title">안내에 따라 무릎을 움직여볼게요</h2>
+      </div>
+
+      <div class="step-progress" id="step-progress" aria-hidden="true"></div>
+
+      <div class="step-card">
+        <span class="step-num" id="step-num">1 / 5</span>
+        <p id="step-text"></p>
+        <div id="step-figure-slot"></div>
+      </div>
+
+      <div class="step-nav">
+        <button class="step-nav-prev" id="btn-step-prev" type="button">← 이전</button>
+        <button class="step-nav-next" id="btn-step-next" type="button" aria-label="다음 안내">→</button>
+      </div>
+
+      <button class="btn btn-primary" id="btn-ready-complete" type="button" hidden>측정 준비 완료</button>
+    </section>
+
+    <!-- 신전 범위 측정: 실시간 측정 -->
+    <section class="view" id="view-measure-live" hidden>
+      <div>
+        <div class="eyebrow">1 · 신전 가능 범위 측정</div>
+        <h2 class="view-title">측정 중이에요</h2>
+      </div>
+
+      <div class="signal-card" id="signal-card">
+        <div class="signal-ring" aria-hidden="true"></div>
+        <div class="signal-text" id="signal-text">준비하고 있어요…</div>
+        <div class="signal-progress" id="signal-progress"></div>
+      </div>
+
+      <p class="assist-note">보조 측정자는 무릎이 위아래로 흔들리지 않도록만 잡아주세요. 좌우로 흔들리는 것은 측정의 일부이니 그대로 두세요.</p>
+
+      <p class="complete-banner" id="complete-banner" hidden></p>
+
+      <button class="btn btn-secondary" id="btn-finish-measuring" type="button">측정 완료</button>
+    </section>
+
+    <!-- 신전 범위 측정: 결과 -->
+    <section class="view" id="view-measure-result" hidden>
+      <div>
+        <div class="eyebrow">1 · 신전 가능 범위 측정</div>
+        <h2 class="view-title">측정이 끝났어요</h2>
+      </div>
+
+      <div class="result-tile">
+        <span class="result-label">측정된 최대 신전 각도</span>
+        <span class="result-value" id="result-value">0°</span>
+        <span class="result-caption">0°에 가까울수록 무릎이 완전히 펴진 상태예요.</span>
+      </div>
+
+      <button class="btn btn-primary next-method-btn" id="btn-next-method" type="button">
+        <span class="label-top">다음 단계 →</span>
+        <span class="label-main">2. 통증 내비 체조를 통한 내 무릎 통증 유형 예측하기</span>
+      </button>
+    </section>
+
+    <!-- 기존 사용자 스페이스 홈 -->
+    <section class="view" id="view-space-home" hidden>
+      <div>
+        <div class="eyebrow">내 스페이스</div>
+        <h2 class="view-title">다시 오셨네요</h2>
+        <p class="lede welcome-note">이전 기록을 살펴보거나, 바로 새 측정을 시작할 수 있어요.</p>
+      </div>
+
+      <div class="btn-col">
+        <button class="btn btn-secondary" id="btn-view-history" type="button">이전 무릎 기록</button>
+        <button class="btn btn-primary" id="btn-start-measuring-home" type="button">측정 시작하기</button>
+      </div>
+    </section>
+
+    <!-- 이전 무릎 기록 -->
+    <section class="view" id="view-history" hidden>
+      <div>
+        <div class="eyebrow">이전 무릎 기록</div>
+        <h2 class="view-title">최대 신전 각도 변화</h2>
+      </div>
+
+      <div id="history-body"></div>
+
+      <button class="btn btn-secondary" id="btn-history-back" type="button">돌아가기</button>
+    </section>
+
+    <!-- 통증 내비 체조: 금지 대상 안내 -->
+    <section class="view" id="view-gym-warning" hidden>
+      <div>
+        <div class="eyebrow">2 · 통증 내비 체조</div>
+        <h2 class="view-title">통증 내비 체조를 하면 안 되는 사람</h2>
+      </div>
+
+      <p class="warning-banner" id="warning-personal-note" hidden></p>
+
+      <ul class="warning-list">
+        <li class="warning-item">
+          <span class="cond">넘어지거나 삐어서 생긴 무릎 통증</span>
+          <span class="advice">시간이 충분히 지나 골절이 회복된 후 체조를 하세요.</span>
+        </li>
+        <li class="warning-item">
+          <span class="cond">발적을 동반한 무릎 통증</span>
+          <span class="advice">감염성이 있을 수 있으므로, 화농성 무릎 관절염에는 항생제 투여나 무릎 관절의 농을 빼는 치료가 효과적입니다.</span>
+        </li>
+        <li class="warning-item">
+          <span class="cond">무릎에 종양이 있는 경우</span>
+          <span class="advice">악화될 위험이 있으므로 의사의 진단을 받으세요.</span>
+        </li>
+        <li class="warning-item">
+          <span class="cond">류마티스 관절염 / 인공 무릎 관절 수술을 한 경우 / 스테로이드 호르몬제를 사용하고 있는 경우</span>
+          <span class="advice">주치의와 상담하며 체조를 하세요.</span>
+        </li>
+      </ul>
+
+      <button class="btn btn-primary" id="btn-gym-warning-next" type="button">다음</button>
+    </section>
+
+    <!-- 통증 내비 체조: 설문 안내 -->
+    <section class="view" id="view-gym-intro" hidden>
+      <div>
+        <div class="eyebrow">2 · 통증 내비 체조</div>
+        <h2 class="view-title">무릎 통증 원인 예측</h2>
+        <p class="lede">각 부위의 체조를 한 후, 통증의 강도, 움직일 수 있는 범위, 걷기 편한 정도가 개선될 경우 그 부위가 통증의 원인이므로 그에 적합한 체조를 추천하기 위한 설문입니다.</p>
+        <p class="hint">* 체조 후 통증 부위가 달라질 수 있습니다.</p>
+      </div>
+      <div class="step-nav" style="justify-content:flex-end;">
+        <button class="step-nav-next" id="btn-gym-intro-next" type="button" aria-label="통증 설문조사로 이동">→</button>
+      </div>
+    </section>
+
+    <!-- 통증 내비 체조: 통증 강도 설문 -->
+    <section class="view" id="view-gym-severity" hidden>
+      <div>
+        <div class="eyebrow">2 · 통증 내비 체조</div>
+        <h2 class="view-title">통증의 강도가 어떤가요?</h2>
+      </div>
+
+      <div class="slider-field">
+        <input type="range" id="severity-slider" min="0" max="2" step="1" value="0" aria-label="통증 강도">
+        <div class="slider-ticks">
+          <span>하<br>걷는 데에 큰 지장이 없음</span>
+          <span>중<br>걸을 수는 있지만 아프고 불편함</span>
+          <span>상<br>앉았다 일어나는 것이 힘듦</span>
+        </div>
+      </div>
+
+      <p class="severity-banner" id="severity-banner"></p>
+
+      <button class="btn btn-primary" id="btn-gym-severity-next" type="button">다음</button>
+    </section>
+
+    <!-- 통증 내비 체조: 유형 검사 안내 -->
+    <section class="view" id="view-gym-test-intro" hidden>
+      <div>
+        <div class="eyebrow">2 · 통증 내비 체조</div>
+        <h2 class="view-title">통증 원인 예측 검사</h2>
+        <p class="lede">지금부터는 시간이 20분 가량 소요될 예정이니, 참고해주시길 바랍니다. 이미 해당 설문조사를 진행해보신 사용자는 이전 본인의 유형과 유사한 진단방법을 먼저 사용하여 본인의 통증을 예측하시면 시간을 단축하실 수 있습니다.</p>
+      </div>
+      <button class="btn btn-primary" id="btn-gym-test-intro-confirm" type="button">확인</button>
+    </section>
+
+    <!-- 통증 내비 체조: 유형 검사 워크스루 -->
+    <section class="view" id="view-gym-test" hidden>
+      <div>
+        <div class="eyebrow">2 · 통증 내비 체조</div>
+        <h2 class="view-title">통증 원인 예측 검사</h2>
+      </div>
+
+      <div class="step-progress" id="test-progress" aria-hidden="true"></div>
+
+      <div class="step-card">
+        <span class="step-num" id="test-num"></span>
+        <span class="test-category-label" id="test-category-label" hidden></span>
+        <p class="test-move" id="test-move" hidden></p>
+        <p id="test-text"></p>
+      </div>
+
+      <div class="step-nav">
+        <button class="step-nav-prev" id="btn-test-prev" type="button">← 이전</button>
+        <button class="step-nav-next" id="btn-test-next" type="button" aria-label="다음">→</button>
+      </div>
+
+      <button class="btn btn-primary" id="btn-test-complete" type="button" hidden>검사 완료</button>
+    </section>
+
+    <!-- 통증 내비 체조: 유형 선택 -->
+    <section class="view" id="view-gym-type-select" hidden>
+      <div>
+        <div class="eyebrow">2 · 통증 내비 체조</div>
+        <h2 class="view-title">나의 통증 유형은?</h2>
+        <p class="lede">방금 해본 동작 중에서 통증이 가장 좋아졌던 동작을 골라주세요.</p>
+      </div>
+
+      <div id="type-select-body"></div>
+
+      <button class="btn btn-primary" id="btn-gym-recommend" type="button" hidden>나에게 맞는 통증 개선 스트레칭 추천받기</button>
+    </section>
+
+    <!-- 통증 내비 체조: 추천 스트레칭 -->
+    <section class="view" id="view-gym-result" hidden>
+      <div>
+        <div class="eyebrow">2 · 통증 내비 체조</div>
+        <h2 class="view-title" id="gym-result-title"></h2>
+      </div>
+
+      <div id="gym-result-body"></div>
+
+      <button class="btn btn-ghost" id="btn-copy-gym-result" type="button">스트레칭 방법 복사하기</button>
+
+      <p class="alarm-status" id="alarm-status" hidden></p>
+
+      <div class="btn-row">
+        <button class="btn btn-primary" id="btn-set-stretch-alarm" type="button">다음 스트레칭 알람 설정하기</button>
+        <button class="btn btn-secondary" id="btn-gym-result-home" type="button">홈으로 돌아가기</button>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+(function(){
+  'use strict';
+
+  var VIEWS = [
+    'view-start',
+    'view-signup',
+    'view-login',
+    'view-profile',
+    'view-space-intro',
+    'view-measure-instructions',
+    'view-measure-device',
+    'view-measure-guide',
+    'view-measure-live',
+    'view-measure-result',
+    'view-space-home',
+    'view-history',
+    'view-gym-warning',
+    'view-gym-intro',
+    'view-gym-severity',
+    'view-gym-test-intro',
+    'view-gym-test',
+    'view-gym-type-select',
+    'view-gym-result'
+  ];
+  var CURRENT_YEAR = new Date().getFullYear();
+
+  var topbar = document.getElementById('topbar');
+  var headerChip = document.getElementById('header-code-chip');
+  var navStack = [];
+  var currentCode = null;
+  var deviceTimer = null;
+  var liveMeasureTimer = null;
+  var resultRedirectTimer = null;
+  var lastMeasurement = null;
+  var currentStepIndex = 0;
+  var currentProfile = null;
+  var severityIndex = 0;
+  var currentTestIndex = 0;
+  var selectedType = null;
+  var gymResultCopyText = '';
+  var alarmIntervalHandle = null;
+
+  function byId(id){ return document.getElementById(id); }
+
+  function show(id, opts){
+    opts = opts || {};
+    var leaving = navStack.length ? navStack[navStack.length - 1] : null;
+    if (id !== 'view-measure-device' && leaving === 'view-measure-device') {
+      stopDeviceDemo();
+    }
+    if (id !== 'view-measure-live' && leaving === 'view-measure-live') {
+      stopLiveMeasurement();
+    }
+    VIEWS.forEach(function(v){ byId(v).hidden = (v !== id); });
+    topbar.hidden = (id === 'view-start');
+    if (!opts.silent) navStack.push(id);
+    window.scrollTo(0, 0);
+  }
+
+  byId('btn-back').addEventListener('click', function(){
+    navStack.pop();
+    var prev = navStack.pop();
+    show(prev || 'view-start');
+  });
+
+  byId('btn-go-login').addEventListener('click', function(){
+    byId('login-input').value = '';
+    byId('login-error').hidden = true;
+    show('view-login');
+  });
+
+  byId('btn-go-signup-start').addEventListener('click', function(){
+    show('view-signup');
+    createNewUser();
+  });
+
+  byId('btn-enter-space').addEventListener('click', function(){
+    // 방금 발급된 코드는 프로필이 없는 게 확정이므로 바로 입력 화면으로.
+    resetProfileForm();
+    show('view-profile');
+  });
+
+  byId('btn-submit-login').addEventListener('click', tryLogin);
+  byId('login-input').addEventListener('keydown', function(e){
+    if (e.key === 'Enter') tryLogin();
+  });
+
+  byId('profile-birthyear').addEventListener('input', updateAgePreview);
+  byId('btn-save-profile').addEventListener('click', saveProfile);
+
+  byId('btn-start-measuring').addEventListener('click', function(){
+    show('view-measure-instructions');
+  });
+
+  byId('btn-start-measuring-home').addEventListener('click', function(){
+    show('view-measure-instructions');
+  });
+
+  byId('btn-begin-device').addEventListener('click', function(){
+    show('view-measure-device');
+    startDeviceDemo();
+  });
+
+  byId('btn-measure-extension').addEventListener('click', function(){
+    currentStepIndex = 0;
+    renderStep();
+    show('view-measure-guide');
+  });
+
+  byId('btn-step-prev').addEventListener('click', function(){
+    if (currentStepIndex > 0) { currentStepIndex--; renderStep(); }
+  });
+
+  byId('btn-step-next').addEventListener('click', function(){
+    if (currentStepIndex < STEP_DATA.length - 1) { currentStepIndex++; renderStep(); }
+  });
+
+  byId('btn-ready-complete').addEventListener('click', function(){
+    show('view-measure-live');
+    startLiveMeasurement();
+  });
+
+  byId('btn-finish-measuring').addEventListener('click', function(){
+    finishMeasurement();
+  });
+
+  byId('btn-next-method').addEventListener('click', function(){
+    enterGymFlow();
+  });
+
+  byId('btn-view-history').addEventListener('click', function(){
+    loadHistory();
+  });
+
+  byId('btn-history-back').addEventListener('click', function(){
+    show('view-space-home');
+  });
+
+  byId('btn-gym-warning-next').addEventListener('click', function(){
+    show('view-gym-intro');
+  });
+
+  byId('btn-gym-intro-next').addEventListener('click', function(){
+    severityIndex = 0;
+    byId('severity-slider').value = 0;
+    renderSeverityBanner();
+    show('view-gym-severity');
+  });
+
+  byId('severity-slider').addEventListener('input', function(){
+    severityIndex = parseInt(byId('severity-slider').value, 10);
+    renderSeverityBanner();
+  });
+
+  byId('btn-gym-severity-next').addEventListener('click', function(){
+    show('view-gym-test-intro');
+  });
+
+  byId('btn-gym-test-intro-confirm').addEventListener('click', function(){
+    currentTestIndex = 0;
+    renderTestCard();
+    show('view-gym-test');
+  });
+
+  byId('btn-test-prev').addEventListener('click', function(){
+    if (currentTestIndex > 0) { currentTestIndex--; renderTestCard(); }
+  });
+
+  byId('btn-test-next').addEventListener('click', function(){
+    if (currentTestIndex < TEST_CARDS.length - 1) { currentTestIndex++; renderTestCard(); }
+  });
+
+  byId('btn-test-complete').addEventListener('click', function(){
+    renderTypeSelect();
+    show('view-gym-type-select');
+  });
+
+  byId('btn-gym-recommend').addEventListener('click', function(){
+    renderGymResult();
+    show('view-gym-result');
+  });
+
+  byId('btn-copy-gym-result').addEventListener('click', function(){
+    var btn = byId('btn-copy-gym-result');
+    var reset = function(){ btn.textContent = '스트레칭 방법 복사하기'; };
+    var text = gymResultCopyText || '';
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function(){
+        btn.textContent = '복사됨';
+        setTimeout(reset, 1500);
+      }).catch(function(){ selectGymResultText(); });
+    } else {
+      selectGymResultText();
+    }
+  });
+
+  byId('btn-set-stretch-alarm').addEventListener('click', function(){
+    var existing = loadAlarmState();
+    if (existing && existing.enabled) {
+      clearAlarmTimer();
+      saveAlarmState(null);
+      setAlarmStatus('알람을 껐어요.', null);
+      refreshAlarmUI();
+      return;
+    }
+
+    if (!('Notification' in window)) {
+      setAlarmStatus('이 화면에서는 브라우저 알림을 사용할 수 없어요. 이 페이지를 새 탭에서 직접 열어 다시 시도해보세요.', 'error');
+      return;
+    }
+
+    var entry = STRETCHES[selectedType];
+    var hours = computeAlarmIntervalHours(entry);
+    if (hours === null) {
+      setAlarmStatus('지금은 병원 진찰이 먼저예요. 통증이 가라앉은 뒤 다시 설정해주세요.', 'error');
+      return;
+    }
+
+    var btn = byId('btn-set-stretch-alarm');
+    btn.disabled = true;
+
+    Promise.resolve().then(function(){
+      return Notification.requestPermission();
+    }).then(function(permission){
+      btn.disabled = false;
+      if (permission !== 'granted') {
+        setAlarmStatus(permission === 'denied'
+          ? '알림이 차단되어 있어요. 브라우저 설정에서 사뿐의 알림을 허용한 후 다시 시도해주세요.'
+          : '알림 권한을 허용해야 알람을 울릴 수 있어요.', 'error');
+        return;
+      }
+      var state = {
+        enabled: true,
+        type: selectedType,
+        intervalHours: hours,
+        nextFireAt: Date.now() + hours * 3600000
+      };
+      saveAlarmState(state);
+      scheduleNextAlarm(state);
+    }).catch(function(){
+      btn.disabled = false;
+      setAlarmStatus('이 화면에서는 알림을 설정할 수 없어요. 이 페이지를 새 탭에서 직접 열어 다시 시도해보세요.', 'error');
+    });
+  });
+
+  byId('btn-gym-result-home').addEventListener('click', function(){
+    show('view-space-home');
+  });
+
+  function selectGymResultText(){
+    try {
+      var el = byId('gym-result-body');
+      var range = document.createRange();
+      range.selectNodeContents(el);
+      var sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+    } catch (e) { /* ignore */ }
+  }
+
+  byId('btn-copy-code').addEventListener('click', function(){
+    var code = byId('signup-code-text').textContent;
+    var btn = byId('btn-copy-code');
+    var reset = function(){ btn.textContent = '코드 복사'; };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(code).then(function(){
+        btn.textContent = '복사됨';
+        setTimeout(reset, 1500);
+      }).catch(function(){ selectCodeText(); });
+    } else {
+      selectCodeText();
+    }
+  });
+
+  function selectCodeText(){
+    try {
+      var el = byId('signup-code-text');
+      var range = document.createRange();
+      range.selectNodeContents(el);
+      var sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+    } catch (e) { /* ignore */ }
+  }
+
+  function updateHeaderChip(){
+    if (currentCode) {
+      headerChip.textContent = currentCode;
+      headerChip.hidden = false;
+    }
+  }
+
+  // ---- db ----
+  var dbPromise = null;
+  function ensureDb(){
+    if (!dbPromise) {
+      dbPromise = (window.claude && window.claude.use)
+        ? window.claude.use('db').catch(function(){ return null; })
+        : Promise.resolve(null);
+    }
+    return dbPromise;
+  }
+
+  var CODE_CHARS = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  function randomCode(len){
+    len = len || 7;
+    var out = '';
+    if (window.crypto && window.crypto.getRandomValues) {
+      var arr = new Uint32Array(len);
+      window.crypto.getRandomValues(arr);
+      for (var i = 0; i < len; i++) out += CODE_CHARS[arr[i] % CODE_CHARS.length];
+    } else {
+      for (var j = 0; j < len; j++) out += CODE_CHARS[Math.floor(Math.random() * CODE_CHARS.length)];
+    }
+    return out;
+  }
+
+  function createNewUser(){
+    var statusEl = byId('signup-status');
+    var codeWrap = byId('signup-code');
+    var codeText = byId('signup-code-text');
+    var hintEl = byId('signup-hint');
+    var enterBtn = byId('btn-enter-space');
+
+    statusEl.textContent = '코드를 만들고 있어요…';
+    statusEl.hidden = false;
+    codeWrap.hidden = true;
+    hintEl.hidden = true;
+    enterBtn.hidden = true;
+
+    ensureDb().then(function(store){
+      if (!store) {
+        statusEl.textContent = '지금은 코드를 만들 수 없어요. 사뿐에 로그인된 상태에서 다시 시도해주세요.';
+        return;
+      }
+      attemptCode(store, 0);
+    });
+
+    function attemptCode(store, tries){
+      if (tries >= 10) {
+        statusEl.textContent = '코드를 만들지 못했어요. 다시 시도해주세요.';
+        return;
+      }
+      var candidate = randomCode(7);
+      store.doc('users/' + candidate).get().then(function(snap){
+        if (snap.exists) {
+          attemptCode(store, tries + 1);
+          return;
+        }
+        // 아직 DB에는 쓰지 않는다 — 기본 정보 입력을 마쳐야 이 코드가 실제로 저장된다.
+        // 이렇게 해야 중간에 그만둔 코드가 영구히 묶이지 않고, 나중에 다른 사람이 같은
+        // 코드를 다시 받을 수 있다.
+        currentCode = candidate;
+        statusEl.hidden = true;
+        codeText.textContent = candidate;
+        codeWrap.hidden = false;
+        hintEl.hidden = false;
+        enterBtn.hidden = false;
+        updateHeaderChip();
+      }).catch(function(err){
+        var code = (err && err.code) ? err.code : '오류';
+        statusEl.textContent = '코드를 확인하지 못했어요 (' + code + '). 다시 시도해주세요.';
+      });
+    }
+  }
+
+  function tryLogin(){
+    var input = byId('login-input');
+    var errorEl = byId('login-error');
+    var code = (input.value || '').trim().toUpperCase();
+    errorEl.hidden = true;
+
+    if (!code) {
+      errorEl.textContent = '코드를 입력해주세요.';
+      errorEl.hidden = false;
+      return;
+    }
+
+    ensureDb().then(function(store){
+      if (!store) {
+        errorEl.textContent = '지금은 로그인할 수 없어요. 잠시 후 다시 시도해주세요.';
+        errorEl.hidden = false;
+        return;
+      }
+      return store.doc('users/' + code).get().then(function(snap){
+        if (!snap.exists) {
+          errorEl.textContent = '일치하는 코드를 찾을 수 없어요. 코드를 다시 확인해주세요.';
+          errorEl.hidden = false;
+          return;
+        }
+        currentCode = code;
+        updateHeaderChip();
+        show('view-space-home');
+      });
+    }).catch(function(){
+      errorEl.textContent = '코드를 확인하는 중 문제가 생겼어요. 다시 시도해주세요.';
+      errorEl.hidden = false;
+    });
+  }
+
+  // ---- 기본 정보 입력 ----
+  function resetProfileForm(){
+    byId('profile-error').hidden = true;
+    byId('profile-birthyear').value = '';
+    byId('age-preview').hidden = true;
+    byId('profile-conditions').value = '';
+    var radios = document.querySelectorAll('#view-profile input[type="radio"]');
+    for (var i = 0; i < radios.length; i++) radios[i].checked = false;
+  }
+
+  function updateAgePreview(){
+    var preview = byId('age-preview');
+    var raw = byId('profile-birthyear').value;
+    var year = parseInt(raw, 10);
+    if (raw && year >= 1900 && year <= CURRENT_YEAR) {
+      preview.textContent = CURRENT_YEAR + '년 기준 만 ' + (CURRENT_YEAR - year) + '세';
+      preview.hidden = false;
+    } else {
+      preview.hidden = true;
+    }
+  }
+
+  function checkedValue(name){
+    var el = document.querySelector('input[name="' + name + '"]:checked');
+    return el ? el.value : null;
+  }
+
+  function saveProfile(){
+    var errorEl = byId('profile-error');
+    errorEl.hidden = true;
+
+    var birthYear = parseInt(byId('profile-birthyear').value, 10);
+    if (!birthYear || birthYear < 1900 || birthYear > CURRENT_YEAR) {
+      errorEl.textContent = '태어난 연도를 정확히 입력해주세요.';
+      errorEl.hidden = false;
+      return;
+    }
+
+    var sex = checkedValue('profile-sex');
+    var joint = checkedValue('profile-joint');
+    var flatfeet = checkedValue('profile-flatfeet');
+    var leg = checkedValue('profile-leg');
+    var flatback = checkedValue('profile-flatback');
+
+    if (!sex || !joint || !flatfeet || !leg || !flatback) {
+      errorEl.textContent = '모든 항목을 선택해주세요.';
+      errorEl.hidden = false;
+      return;
+    }
+
+    if (!currentCode) {
+      errorEl.textContent = '세션에 문제가 생겼어요. 처음부터 다시 시도해주세요.';
+      errorEl.hidden = false;
+      return;
+    }
+
+    var conditions = (byId('profile-conditions').value || '').trim();
+    var saveBtn = byId('btn-save-profile');
+    saveBtn.disabled = true;
+
+    ensureDb().then(function(store){
+      if (!store) {
+        errorEl.textContent = '지금은 저장할 수 없어요. 잠시 후 다시 시도해주세요.';
+        errorEl.hidden = false;
+        saveBtn.disabled = false;
+        return;
+      }
+      var ref = store.doc('users/' + currentCode);
+      return ref.get().then(function(snap){
+        if (snap.exists) {
+          // 코드를 받은 뒤 정보를 입력하는 사이, 같은 코드를 다른 사람이 먼저
+          // 완료한 아주 드문 경우. 덮어쓰지 않고 새 코드를 받도록 안내한다.
+          errorEl.textContent = '이 코드는 방금 다른 분이 먼저 사용했어요. 처음 화면으로 돌아가 새 코드를 다시 받아주세요.';
+          errorEl.hidden = false;
+          saveBtn.disabled = false;
+          return;
+        }
+        return ref.set({
+          code: currentCode,
+          createdAt: Date.now(),
+          records: [],
+          profile: {
+            birthYear: birthYear,
+            sex: sex,
+            jointReplacement: joint === 'yes',
+            flatFeet: flatfeet === 'yes',
+            legAlignment: leg,
+            flatBack: flatback === 'yes',
+            conditions: conditions,
+            savedAt: Date.now()
+          }
+        }).then(function(){
+          saveBtn.disabled = false;
+          show('view-space-intro');
+        });
+      });
+    }).catch(function(err){
+      var code = (err && err.code) ? err.code : '오류';
+      errorEl.textContent = '저장하지 못했어요 (' + code + '). 다시 시도해주세요.';
+      errorEl.hidden = false;
+      saveBtn.disabled = false;
+    });
+  }
+
+  // ---- device demo (placeholder for real ROM hardware link) ----
+  function startDeviceDemo(){
+    var statusEl = byId('device-status');
+    var readoutEl = byId('device-readout');
+    var nextBtn = byId('btn-measure-extension');
+
+    statusEl.textContent = '측정기에 연결하는 중…';
+    readoutEl.hidden = true;
+    nextBtn.hidden = true;
+
+    stopDeviceDemo();
+
+    setTimeout(function(){
+      statusEl.textContent = '허벅지 센서 연결됨 · 정강이 센서 연결됨';
+      readoutEl.hidden = false;
+      nextBtn.hidden = false;
+      var t = 0;
+      deviceTimer = setInterval(function(){
+        t++;
+        var thighX = (-0.97 + Math.sin(t / 5) * 0.01).toFixed(2);
+        var thighY = (0.33 + Math.sin(t / 6) * 0.01).toFixed(2);
+        var shinX = (-0.03 + Math.sin(t / 4) * 0.02).toFixed(2);
+        var shinY = (-0.52 + Math.cos(t / 5) * 0.01).toFixed(2);
+        readoutEl.textContent = '허벅지 aX:' + thighX + ' aY:' + thighY + '  |  정강이 aX:' + shinX + ' aY:' + shinY;
+      }, 400);
+    }, 900);
+  }
+
+  function stopDeviceDemo(){
+    if (deviceTimer) {
+      clearInterval(deviceTimer);
+      deviceTimer = null;
+    }
+  }
+
+  // ---- 신전 범위 측정: 안내 캐러셀 ----
+  var FIGURE_READY =
+    '<figure class="step-figure"><svg viewBox="0 0 220 170" role="img" aria-label="허벅지는 바닥과 평행, 무릎과 종아리 사이는 90도를 이루는 준비 자세">' +
+      '<line x1="15" y1="155" x2="205" y2="155" stroke="currentColor" stroke-width="1.5" opacity="0.5"/>' +
+      '<rect x="65" y="100" width="50" height="8" fill="none" stroke="currentColor" stroke-width="1.5"/>' +
+      '<line x1="72" y1="108" x2="72" y2="155" stroke="currentColor" stroke-width="1.5"/>' +
+      '<line x1="108" y1="108" x2="108" y2="155" stroke="currentColor" stroke-width="1.5"/>' +
+      '<circle cx="93" cy="36" r="9" fill="none" stroke="currentColor" stroke-width="1.5"/>' +
+      '<line x1="95" y1="50" x2="110" y2="100" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>' +
+      '<line x1="110" y1="100" x2="165" y2="100" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>' +
+      '<line x1="165" y1="100" x2="165" y2="155" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>' +
+      '<line x1="165" y1="155" x2="190" y2="155" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>' +
+      '<circle cx="110" cy="100" r="3" fill="currentColor"/>' +
+      '<circle cx="165" cy="100" r="3" fill="currentColor"/>' +
+      '<path d="M 147 100 A 18 18 0 0 1 165 118" fill="none" class="accent-part" stroke="currentColor" stroke-width="2"/>' +
+      '<text x="172" y="116" class="accent-part" fill="currentColor" font-size="12">90°</text>' +
+      '<line x1="110" y1="88" x2="165" y2="88" stroke="currentColor" stroke-width="1" stroke-dasharray="3 3" opacity="0.6"/>' +
+      '<text x="112" y="80" fill="currentColor" font-size="10" opacity="0.75">지면과 평행</text>' +
+    '</svg><figcaption>허벅지는 바닥과 평행하게, 무릎 각도는 90도로</figcaption></figure>';
+
+  var FIGURE_MOVE =
+    '<figure class="step-figure"><svg viewBox="0 0 260 185" role="img" aria-label="무릎을 편 상태와 굽힌 상태 사이를 오가며 움직이는 모습. 위아래 흔들림은 고정하고 좌우 흔들림은 자연스럽게 둡니다">' +
+      '<defs><marker id="sappun-arrow" viewBox="0 0 8 8" refX="6" refY="4" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L8,4 L0,8 Z" class="accent-part" fill="currentColor"/></marker></defs>' +
+      '<line x1="15" y1="155" x2="245" y2="155" stroke="currentColor" stroke-width="1.5" opacity="0.5"/>' +
+      '<rect x="65" y="100" width="50" height="8" fill="none" stroke="currentColor" stroke-width="1.5"/>' +
+      '<line x1="72" y1="108" x2="72" y2="155" stroke="currentColor" stroke-width="1.5"/>' +
+      '<line x1="108" y1="108" x2="108" y2="155" stroke="currentColor" stroke-width="1.5"/>' +
+      '<circle cx="93" cy="36" r="9" fill="none" stroke="currentColor" stroke-width="1.5"/>' +
+      '<line x1="95" y1="50" x2="110" y2="100" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>' +
+      '<line x1="110" y1="100" x2="165" y2="100" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>' +
+      '<circle cx="110" cy="100" r="3" fill="currentColor"/>' +
+      '<circle cx="165" cy="100" r="3" fill="currentColor"/>' +
+      '<line x1="165" y1="100" x2="165" y2="155" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-dasharray="4 4" opacity="0.4"/>' +
+      '<line x1="165" y1="155" x2="188" y2="155" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-dasharray="4 4" opacity="0.4"/>' +
+      '<line x1="165" y1="100" x2="212" y2="122" class="accent-part" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>' +
+      '<line x1="212" y1="122" x2="233" y2="112" class="accent-part" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>' +
+      '<path d="M 178 150 Q 205 145 225 120" fill="none" class="accent-part" stroke="currentColor" stroke-width="1.5" stroke-dasharray="2 4" marker-end="url(#sappun-arrow)"/>' +
+      '<text x="150" y="172" fill="currentColor" font-size="10" opacity="0.8">펴기 ↔ 굽히기</text>' +
+      '<line x1="165" y1="70" x2="165" y2="88" stroke="currentColor" stroke-width="1.5" marker-end="url(#sappun-arrow)"/>' +
+      '<line x1="165" y1="70" x2="165" y2="52" stroke="currentColor" stroke-width="1.5" marker-end="url(#sappun-arrow)"/>' +
+      '<text x="178" y="60" fill="currentColor" font-size="9" opacity="0.75">위아래는</text>' +
+      '<text x="178" y="71" fill="currentColor" font-size="9" opacity="0.75">고정</text>' +
+    '</svg><figcaption>무릎 위아래는 고정하고, 신호에 맞춰 펴고 굽히기를 반복해요</figcaption></figure>';
+
+  var STEP_DATA = [
+    { text: '지금부터 화면에 안내되는 안내에 따라서 무릎을 움직입니다.', figure: null },
+    { text: '측정을 도와줄 보조 측정자가 있으면 좋습니다.', figure: null },
+    { text: '허벅지를 지면과 평행하게 두고, 무릎과 종아리 사이 각도가 90도가 되도록 합니다. 여기까지가 준비자세입니다.', figure: 'ready' },
+    { text: '준비자세가 끝나면 무릎을 신호에 맞춰서 폈다가 구부립니다. 이때 보조 측정자가 무릎이 위아래로 흔들리지 않도록 잡아주면 좋습니다. 단, 양옆으로 흔들리는 것은 잡지 마세요. 측정의 일환입니다.', figure: 'move' },
+    { text: "그럼, 준비가 완료되면 아래에 '측정 준비 완료' 버튼을 클릭해주세요.", figure: null }
+  ];
+
+  function renderStep(){
+    var step = STEP_DATA[currentStepIndex];
+    byId('step-num').textContent = (currentStepIndex + 1) + ' / ' + STEP_DATA.length;
+    byId('step-text').textContent = step.text;
+    byId('step-figure-slot').innerHTML = step.figure === 'ready' ? FIGURE_READY : (step.figure === 'move' ? FIGURE_MOVE : '');
+
+    var dots = byId('step-progress');
+    dots.innerHTML = '';
+    for (var i = 0; i < STEP_DATA.length; i++) {
+      var span = document.createElement('span');
+      if (i <= currentStepIndex) span.className = 'done';
+      dots.appendChild(span);
+    }
+
+    var isLast = (currentStepIndex === STEP_DATA.length - 1);
+    byId('btn-step-prev').disabled = (currentStepIndex === 0);
+    byId('btn-step-next').hidden = isLast;
+    byId('btn-ready-complete').hidden = !isLast;
+  }
+
+  // ---- 신전 범위 측정: 실시간 측정 (데모 시뮬레이션) ----
+  var REPS = 3;
+  var liveSamples = [];
+
+  function startLiveMeasurement(){
+    stopLiveMeasurement();
+    liveSamples = [];
+    byId('complete-banner').hidden = true;
+    byId('btn-finish-measuring').disabled = false;
+
+    var phase = 0;
+    var totalPhases = REPS * 2;
+
+    function runPhase(){
+      if (phase >= totalPhases) { finishMeasurement(); return; }
+      var extending = (phase % 2 === 0);
+      byId('signal-text').textContent = extending ? '무릎을 펴주세요' : '무릎을 굽혀주세요';
+      byId('signal-progress').textContent = (Math.floor(phase / 2) + 1) + ' / ' + REPS;
+      liveMeasureTimer = setTimeout(function(){
+        if (extending) {
+          liveSamples.push({
+            extension: 2 + Math.random() * 7,
+            wobble: 1 + Math.random() * 5
+          });
+        }
+        phase++;
+        runPhase();
+      }, 2200);
+    }
+    runPhase();
+  }
+
+  function stopLiveMeasurement(){
+    if (liveMeasureTimer) { clearTimeout(liveMeasureTimer); liveMeasureTimer = null; }
+    if (resultRedirectTimer) { clearTimeout(resultRedirectTimer); resultRedirectTimer = null; }
+  }
+
+  function finishMeasurement(){
+    stopLiveMeasurement();
+    byId('signal-text').textContent = '측정 완료';
+    byId('signal-progress').textContent = '';
+
+    var best = null, wobbleSum = 0, wobbleCount = 0;
+    liveSamples.forEach(function(s){
+      if (best === null || s.extension < best) best = s.extension;
+      wobbleSum += s.wobble;
+      wobbleCount++;
+    });
+    if (best === null) best = 2 + Math.random() * 7;
+    var avgWobble = wobbleCount ? (wobbleSum / wobbleCount) : (1 + Math.random() * 5);
+
+    lastMeasurement = {
+      maxExtensionAngle: Math.round(best * 10) / 10,
+      lateralWobble: Math.round(avgWobble * 10) / 10,
+      date: new Date().toISOString().slice(0, 10),
+      recordedAt: Date.now()
+    };
+
+    byId('complete-banner').textContent = '이제 측정이 끝났습니다. 무릎을 편하게 하셔도 됩니다.';
+    byId('complete-banner').hidden = false;
+    byId('btn-finish-measuring').disabled = true;
+
+    saveMeasurement(lastMeasurement);
+
+    resultRedirectTimer = setTimeout(function(){
+      showMeasureResult();
+    }, 5000);
+  }
+
+  function saveMeasurement(measurement){
+    if (!currentCode) return;
+    ensureDb().then(function(store){
+      if (!store) return;
+      return store.collection('users/' + currentCode + '/measurements').add({
+        date: measurement.date,
+        recordedAt: measurement.recordedAt,
+        maxExtensionAngle: measurement.maxExtensionAngle,
+        lateralWobble: measurement.lateralWobble,
+        type: 'simple_rom'
+      });
+    }).catch(function(){ /* 저장에 실패해도 결과 화면은 그대로 보여준다 */ });
+  }
+
+  function showMeasureResult(){
+    if (lastMeasurement) {
+      byId('result-value').textContent = lastMeasurement.maxExtensionAngle + '°';
+    }
+    show('view-measure-result');
+  }
+
+  // ---- 이전 무릎 기록 ----
+  function loadHistory(){
+    var body = byId('history-body');
+    body.innerHTML = '<p class="hint">기록을 불러오는 중…</p>';
+    show('view-history');
+
+    ensureDb().then(function(store){
+      if (!store || !currentCode) { renderHistoryEmpty(body); return; }
+      return store.collection('users/' + currentCode + '/measurements')
+        .orderBy('recordedAt', 'asc')
+        .limit(100)
+        .get()
+        .then(function(qsnap){
+          var records = qsnap.docs.map(function(d){ return d.data(); });
+          if (!records.length) { renderHistoryEmpty(body); return; }
+          renderHistoryChart(body, records);
+        });
+    }).catch(function(){ renderHistoryEmpty(body); });
+  }
+
+  function renderHistoryEmpty(body){
+    body.innerHTML = '';
+    var empty = document.createElement('div');
+    empty.className = 'empty-state';
+    empty.textContent = '아직 측정 기록이 없어요. 측정을 먼저 진행해보세요.';
+    body.appendChild(empty);
+  }
+
+  function renderHistoryChart(body, records){
+    body.innerHTML = '';
+
+    var W = Math.max(260, records.length * 56);
+    var H = 180;
+    var padL = 26, padR = 16, padT = 16, padB = 34;
+    var plotW = W - padL - padR;
+    var plotH = H - padT - padB;
+    var domainMax = 20;
+
+    function xFor(i){
+      if (records.length === 1) return padL + plotW / 2;
+      return padL + (plotW * i) / (records.length - 1);
+    }
+    function yFor(v){
+      var clamped = Math.max(0, Math.min(domainMax, v));
+      return padT + plotH - (clamped / domainMax) * plotH;
+    }
+
+    var parts = [];
+    parts.push('<svg viewBox="0 0 ' + W + ' ' + H + '" width="' + W + '" style="width:' + W + 'px;height:auto;" role="img" aria-label="날짜별로 측정된 최대 신전 각도의 변화">');
+
+    [0, 10, 20].forEach(function(v){
+      var y = yFor(v);
+      parts.push('<line x1="' + padL + '" y1="' + y + '" x2="' + (W - padR) + '" y2="' + y + '" class="chart-zero-line"/>');
+      parts.push('<text x="2" y="' + (y + 3) + '" class="chart-grid-label">' + v + '</text>');
+    });
+
+    if (records.length > 1) {
+      var pts = records.map(function(r, i){ return xFor(i) + ',' + yFor(r.maxExtensionAngle); }).join(' ');
+      parts.push('<polyline points="' + pts + '" class="chart-line"/>');
+    }
+
+    records.forEach(function(r, i){
+      var x = xFor(i), y = yFor(r.maxExtensionAngle);
+      var label = (r.date || '') + ' ' + r.maxExtensionAngle + '도';
+      parts.push('<circle class="chart-hit" cx="' + x + '" cy="' + y + '" r="16" data-index="' + i + '" tabindex="0" role="button" aria-label="' + label + '"></circle>');
+      parts.push('<circle class="chart-point" id="chart-point-' + i + '" cx="' + x + '" cy="' + y + '" r="5"></circle>');
+      parts.push('<text x="' + x + '" y="' + (y - 11) + '" text-anchor="middle" class="chart-value-label">' + r.maxExtensionAngle + '</text>');
+      parts.push('<text x="' + x + '" y="' + (H - 10) + '" text-anchor="middle" class="chart-date-label">' + String(r.date || '').slice(5) + '</text>');
+    });
+
+    parts.push('</svg>');
+
+    var wrap = document.createElement('div');
+    wrap.className = 'chart-wrap';
+    wrap.innerHTML = parts.join('');
+    body.appendChild(wrap);
+
+    var detail = document.createElement('div');
+    detail.className = 'detail-card';
+    body.appendChild(detail);
+
+    function selectIndex(i){
+      for (var k = 0; k < records.length; k++) {
+        var pt = byId('chart-point-' + k);
+        if (pt) pt.classList.toggle('selected', k === i);
+      }
+      var r = records[i];
+      detail.innerHTML =
+        '<span class="detail-date">' + r.date + '</span>' +
+        '<div class="detail-row"><span>최대 신전 각도</span><span>' + r.maxExtensionAngle + '°</span></div>' +
+        '<div class="detail-row"><span>좌우 흔들림 정도</span><span>' + (r.lateralWobble != null ? r.lateralWobble + '°' : '-') + '</span></div>';
+    }
+
+    var hits = wrap.querySelectorAll('.chart-hit');
+    for (var h = 0; h < hits.length; h++) {
+      (function(hit){
+        hit.addEventListener('click', function(){
+          selectIndex(parseInt(hit.getAttribute('data-index'), 10));
+        });
+        hit.addEventListener('keydown', function(e){
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            selectIndex(parseInt(hit.getAttribute('data-index'), 10));
+          }
+        });
+      })(hits[h]);
+    }
+
+    selectIndex(records.length - 1);
+  }
+
+  // ---- 통증 내비 체조: 진입 + 프로필 로드 ----
+  function loadProfile(){
+    return ensureDb().then(function(store){
+      if (!store || !currentCode) { currentProfile = null; return null; }
+      return store.doc('users/' + currentCode).get().then(function(snap){
+        currentProfile = (snap.exists && snap.data().profile) ? snap.data().profile : null;
+        return currentProfile;
+      });
+    }).catch(function(){ currentProfile = null; return null; });
+  }
+
+  function renderWarningPersonalNote(profile){
+    var note = byId('warning-personal-note');
+    if (profile && (profile.jointReplacement || (profile.conditions && profile.conditions.trim()))) {
+      var parts = [];
+      if (profile.jointReplacement) parts.push('인공관절 수술 이력');
+      if (profile.conditions && profile.conditions.trim()) parts.push('지병(' + profile.conditions.trim() + ')');
+      note.textContent = '입력하신 정보에 ' + parts.join(', ') + '이(가) 있어요. 체조 전에 주치의와 상담해주세요.';
+      note.hidden = false;
+    } else {
+      note.hidden = true;
+    }
+  }
+
+  function enterGymFlow(){
+    loadProfile().then(function(profile){
+      renderWarningPersonalNote(profile);
+      show('view-gym-warning');
+    });
+  }
+
+  // ---- 통증 강도 슬라이더 ----
+  function renderSeverityBanner(){
+    var banner = byId('severity-banner');
+    if (severityIndex === 0) {
+      banner.textContent = '최종 진단으로 나온 체조를 5~6시간 간격으로 하세요.';
+      banner.classList.remove('severe');
+    } else if (severityIndex === 1) {
+      banner.textContent = '최종 진단으로 나온 체조를 3시간 간격으로 하세요.';
+      banner.classList.remove('severe');
+    } else {
+      banner.textContent = '지금은 체조를 하지 말고 병원에서 진단을 받으세요.';
+      banner.classList.add('severe');
+    }
+  }
+
+  // ---- 통증 원인 예측 검사 ----
+  var GYM_CATEGORIES = [
+    {
+      key: 'lumbar', title: '요추형 무릎 통증',
+      intro: '허리의 움직임과 무릎 통증이 연관되어 있는지 확인하는 테스트예요.',
+      palpation: false,
+      tests: [
+        { move: '허리를 뒤로 젖힌다', type: '요추 후굴 개선형' },
+        { move: '허리를 앞으로 숙인다', type: '요추 전굴 개선형' },
+        { move: '엉덩이를 좌우로 밀어낸다', type: '요추 측방향 개선형' }
+      ]
+    },
+    {
+      key: 'joint', title: '관절형 무릎 통증',
+      intro: '무릎 관절 자체의 움직임과 통증의 관계를 확인하는 테스트예요.',
+      palpation: false,
+      tests: [
+        { move: '무릎을 편다', type: '관절 신전 개선형' },
+        { move: '무릎을 구부린다', type: '관절 굴곡 개선형' }
+      ]
+    },
+    {
+      key: 'patella', title: '접시뼈형 무릎 통증',
+      intro: '무릎뼈(슬개골) 주변 압통점을 확인하는 테스트예요.',
+      palpation: true,
+      tests: [
+        { move: '접시뼈의 안쪽 아래를 누른다', type: '접시뼈 내하 개선형' },
+        { move: '접시뼈의 바깥쪽 아래를 누른다', type: '접시뼈 외하 개선형' },
+        { move: '접시뼈의 안쪽 위를 누른다', type: '접시뼈 내상 개선형' },
+        { move: '접시뼈의 바깥쪽 위를 누른다', type: '접시뼈 외상 개선형' }
+      ]
+    },
+    {
+      key: 'muscle', title: '근육형 무릎 통증',
+      intro: '무릎 주변 근육의 압통점을 확인하는 테스트예요.',
+      palpation: true,
+      tests: [
+        { move: '장딴지를 누른다', type: '장딴지 개선형' },
+        { move: '내측 광근을 누른다', type: '안쪽 허벅지 개선형' },
+        { move: '외측 광근을 누른다', type: '바깥 허벅지 개선형' },
+        { move: '햄스트링스를 누른다', type: '허벅지 뒤 개선형' }
+      ]
+    }
+  ];
+
+  var TEST_CARDS = [];
+  GYM_CATEGORIES.forEach(function(cat){
+    TEST_CARDS.push({ kind: 'title', category: cat });
+    cat.tests.forEach(function(t){
+      TEST_CARDS.push({ kind: 'test', category: cat, move: t.move, type: t.type });
+    });
+  });
+
+  function renderTestCard(){
+    var card = TEST_CARDS[currentTestIndex];
+    byId('test-num').textContent = (currentTestIndex + 1) + ' / ' + TEST_CARDS.length;
+
+    var dots = byId('test-progress');
+    dots.innerHTML = '';
+    for (var i = 0; i < TEST_CARDS.length; i++) {
+      var span = document.createElement('span');
+      if (i <= currentTestIndex) span.className = 'done';
+      dots.appendChild(span);
+    }
+
+    if (card.kind === 'title') {
+      byId('test-category-label').hidden = true;
+      byId('test-move').hidden = false;
+      byId('test-move').textContent = card.category.title;
+      byId('test-text').textContent = card.category.intro;
+    } else {
+      byId('test-category-label').hidden = false;
+      byId('test-category-label').textContent = card.category.title;
+      byId('test-move').hidden = false;
+      byId('test-move').textContent = card.move;
+      var action = card.category.palpation ? '누른 후' : '동작 전후로';
+      byId('test-text').textContent = action + ' 통증의 강도, 움직일 수 있는 범위, 걷기 편한 정도를 비교해보세요. 좋아졌다면 이 동작이 원인일 가능성이 높아요.';
+    }
+
+    var isLast = (currentTestIndex === TEST_CARDS.length - 1);
+    byId('btn-test-prev').disabled = (currentTestIndex === 0);
+    byId('btn-test-next').hidden = isLast;
+    byId('btn-test-complete').hidden = !isLast;
+  }
+
+  // ---- 나의 통증 유형은? ----
+  function renderTypeSelect(){
+    selectedType = null;
+    byId('btn-gym-recommend').hidden = true;
+    var body = byId('type-select-body');
+    body.innerHTML = '';
+    var frag = document.createDocumentFragment();
+
+    GYM_CATEGORIES.forEach(function(cat){
+      var groupTitle = document.createElement('div');
+      groupTitle.className = 'type-group-title';
+      groupTitle.textContent = cat.title;
+      frag.appendChild(groupTitle);
+
+      var group = document.createElement('div');
+      group.className = 'type-group';
+      cat.tests.forEach(function(t, idx){
+        var id = 'type-opt-' + cat.key + '-' + idx;
+        var input = document.createElement('input');
+        input.type = 'radio';
+        input.name = 'pain-type';
+        input.id = id;
+        input.className = 'type-option';
+        input.value = t.type;
+
+        var label = document.createElement('label');
+        label.className = 'type-option-label';
+        label.setAttribute('for', id);
+        label.textContent = t.type;
+
+        input.addEventListener('change', function(){
+          selectedType = t.type;
+          byId('btn-gym-recommend').hidden = false;
+        });
+
+        group.appendChild(input);
+        group.appendChild(label);
+      });
+      frag.appendChild(group);
+    });
+
+    body.appendChild(frag);
+  }
+
+  // ---- 추천 스트레칭 데이터 ----
+  var STRETCHES = {
+    '요추 후굴 개선형': {
+      timed: true, setInfo: '10회 1세트 X 5~6회',
+      steps: [
+        '벽에서 반 걸음 내지 한 걸음 떨어져서 양발을 어깨 너비로 벌리고 선다. 턱을 당기고 앞을 본다.',
+        '벽에 양 손바닥을 댄다.',
+        '양손을 벽에 댄 채 허리를 앞으로 민다. 허리의 힘을 빼고 가능한 한 휘게 하여 2~3초 유지한다.',
+        '천천히 허리를 처음 위치로 되돌린다.'
+      ],
+      caution: '팔꿈치와 무릎이 구부러지지 않도록 주의!'
+    },
+    '요추 전굴 개선형': {
+      timed: true, setInfo: '10회 1세트 X 5~6회',
+      steps: [
+        '벽을 등지고 30cm정도 떨어져 선다. 양발을 어깨너비로 벌리고 벽에 기댄다. 발은 벽에서 반 걸음 내지 한 걸음 떨어뜨린다.',
+        '골반을 벽에 붙인 채 인사하듯 천천히 상체를 앞으로 숙여 2~3초 동안 유지한다.',
+        '천천히 상체를 일으켜 허리를 처음 위치로 되돌린다.'
+      ],
+      caution: '허리 시작 부분부터 굽히지 말 것!'
+    },
+    '요추 측방향 개선형': {
+      timed: true, setInfo: '10회 1세트 X 5~6회',
+      steps: [
+        '벽을 왼쪽에 둔 상태에서 양발을 어깨너비로 벌리고 벽에서 조금 떨어져 선다. 왼쪽 팔꿈치를 구부려 벽에 대고 왼쪽 어깨와 팔꿈치가 수평이 되도록 벽과 몸의 거리를 조절한다.',
+        '양 어깨를 수평으로 유지하면서 오른 손을 골반에 대고 밀어내어 엉덩이를 왼쪽으로 내민 채 2~3초동안 유지한다.',
+        '천천히 처음 자세로 돌아간다.',
+        '오른쪽 방향으로 되풀이한다.'
+      ],
+      caution: '벽과 반대쪽 어깨가 처지지 않도록 할 것'
+    },
+    '관절 신전 개선형': {
+      timed: true, setInfo: '10회 1세트 X 5~6회',
+      steps: [
+        '의자에 살짝 걸터앉아 통증이 있는 쪽 다리를 펴서 앞으로 내밀어 무릎의 접시뼈 바로 위에 양손바닥을 댄다.',
+        '양손에 힘을 주어 무릎을 수직으로 눌러서 무릎 뒤가 완전히 펴졌다고 느껴질 때까지 천천히 힘을 준다.',
+        '그대로 1~2초동안 유지한 후 힘을 뺀다.'
+      ],
+      caution: '팔꿈치와 무릎이 구부러지지 않도록 주의',
+      variants: [
+        {
+          title: '쉬운 무릎 펴기 체조',
+          sub: '65세 이상에게 추천 · 무릎을 손으로 누르지 않고도 무릎 관절을 펴는 방법',
+          steps: [
+            '의자에 살짝 앉아서 아픈 쪽 다리를 펴서 앞으로 내민다.',
+            '허리를 구부리지 않도록 하면서 골반을 앞으로 기울인다. 무릎 뒤가 완전히 펴졌다고 느껴질 때까지 골반을 앞으로 기울여서 그대로 1~2초 유지한 다음 힘을 뺀다.'
+          ]
+        },
+        {
+          title: '무릎 펴기 체조 (바깥쪽으로)',
+          sub: '무릎 펴기 체조로 통증이 어느 정도 개선됐더라도 사라지지 않는 사람에게 추천',
+          steps: [
+            '의자에 살짝 걸터앉아서 아픈 쪽 다리를 펴서 앞으로 내밀고 무릎 접시뼈 바로 위에 양손 바닥을 댄다.',
+            '발을 바깥쪽으로 향하고 무릎부터 정강이를 바깥쪽으로 돌린다. 양손에 힘을 주고 무릎을 수직으로 누르며 무릎 뒤가 완전히 펴졌다고 느껴질 때까지 천천히 힘을 가한다.',
+            '그 상태로 1~2초 유지한 후 힘 빼기를 10회 반복한다.'
+          ]
+        },
+        {
+          title: '무릎 펴기 체조 (안쪽으로)',
+          sub: '무릎을 밖으로 향하고 펴는 체조로도 통증이 개선되지 않는 사람에게',
+          steps: [
+            '의자에 살짝 걸터앉아서 아픈 쪽 다리를 앞으로 내밀고 접시뼈 바로 위에 양 손바닥을 댄다.',
+            '발을 안쪽으로 향하게 하여 무릎부터 정강이까지 안쪽으로 돌린다. 양손에 힘을 주어서 무릎을 수직으로 누르며 무릎 뒤가 완전히 펴졌다고 느껴질 때까지 천천히 힘을 가한다.',
+            '그대로 1~2초 유지한 후 힘 빼기를 10회 반복한다.'
+          ]
+        }
+      ]
+    },
+    '관절 굴곡 개선형': {
+      timed: true, setInfo: '10회 1세트 X 5~6회',
+      steps: [
+        '아픈 쪽 다리를 의자나 침대에 올리고 무릎 위에 양손을 댄다. 몸을 중심으로 앞쪽으로 이동시키면서 무릎을 앞으로 내밀어 깊숙이 구부린다.',
+        '최대한 구부린 상태로 1~2초 유지한 후 처음 자세로 돌아간다.'
+      ],
+      caution: '움직이지 않는 의자를 이용하고, 고관절과 허리는 구부리지 않고 무릎만 구부린다.',
+      variants: [
+        {
+          title: '무릎 구부리기 체조 (바깥쪽으로)',
+          sub: '무릎 구부리기 체조로 통증이 어느 정도 개선되지만 완전히 사라지지 않는 사람에게',
+          steps: [
+            '아픈 쪽 발을 의자나 침대에 올리고 무릎 위에 양손을 댄다.',
+            '발을 바깥쪽으로 향하고 무릎부터 정강이까지 바깥쪽으로 돌린다. 몸 중심을 앞쪽으로 이동시켜 무릎을 앞으로 내밀고, 무릎을 깊게 구부린다.',
+            '최대한 구부린 상태로 1~2초 유지한 후 처음 자세로 복귀하기를 10회 반복한다.'
+          ]
+        },
+        {
+          title: '무릎 구부리기 체조 (안쪽으로)',
+          sub: '무릎을 바깥쪽으로 향하고 구부리는 체조로도 개선되지 않는 사람에게',
+          steps: [
+            '아픈 쪽 발을 의자나 침대에 얹고 무릎 위에 양손을 댄다.',
+            '발을 안쪽으로 향하고 무릎부터 정강이까지 안쪽으로 돌린다. 몸 중심을 앞쪽으로 이동시키며 무릎을 앞으로 내밀어 점차 무릎을 깊숙이 구부린다.',
+            '최대한 구부린 상태에서 1~2초 유지한 후 처음 자세로 되돌아간다.'
+          ]
+        }
+      ]
+    },
+    '접시뼈 내하 개선형': {
+      timed: false, setInfo: '아침 저녁 2세트씩',
+      steps: [
+        '의자에 앉아서 아픈 쪽 무릎을 가볍게 펴고 발꿈치를 바닥에 댄다. 양손 엄지 손가락을 세워 접시뼈 언저리 안쪽 아래 압통점을 무릎 관절 중심을 향해 누른다.',
+        '압통점을 누르면서 발끝을 살짝 위아래로 움직인다. 발목을 움직여서 무릎관절을 구부리고 펴는 운동을 반복한다.'
+      ]
+    },
+    '접시뼈 외하 개선형': {
+      timed: false, setInfo: '아침 저녁 2세트씩',
+      steps: [
+        '의자에 앉아서 아픈 쪽 무릎을 가볍게 펴고 발꿈치를 바닥에 댄다.',
+        '양손 엄지 손가락을 세워 접시뼈 언저리 바깥쪽 아래 압통점을 무릎 관절 중심을 향해 누른다.',
+        '압통점을 누르면서 발끝을 살짝 위아래로 움직인다. 발목을 움직여서 무릎관절을 구부리고 펴는 운동을 반복한다.'
+      ]
+    },
+    '접시뼈 내상 개선형': {
+      timed: false, setInfo: '아침 저녁 2세트씩',
+      steps: [
+        '의자에 앉아서 아픈 쪽 무릎을 가볍게 펴고 발꿈치를 바닥에 댄다.',
+        '양손 엄지 손가락을 세워 접시뼈 언저리 안쪽 위 압통점을 무릎 관절 중심을 향해 누른다.',
+        '압통점을 누르면서 발끝을 살짝 위아래로 움직인다. 발목을 움직여서 무릎관절을 구부리고 펴는 운동을 반복한다.'
+      ]
+    },
+    '접시뼈 외상 개선형': {
+      timed: false, setInfo: '아침 저녁 2세트씩',
+      steps: [
+        '의자에 앉아서 아픈 쪽 무릎을 가볍게 펴고 발꿈치를 바닥에 댄다.',
+        '양손 엄지 손가락을 세워 접시뼈 언저리 바깥쪽 위 압통점을 무릎 관절 중심을 향해 누른다.',
+        '압통점을 누르면서 발끝을 살짝 위아래로 움직인다. 발목을 움직여서 무릎관절을 구부리고 펴는 운동을 반복한다.'
+      ]
+    },
+    '장딴지 개선형': {
+      timed: false, setInfo: '아침 저녁 2세트씩',
+      steps: [
+        '의자에 앉아 무릎 통증이 있는 쪽 다리를 반대편 다리 위에 얹는다.',
+        '무릎 뒤 조금 아래 장딴지에 양손 엄지를 대고 손톱으로 강하게 누른다.',
+        '압통점을 찾으면 엄지손가락으로 장딴지를 압박하면서 발목을 구부렸다 폈다를 반복한다.',
+        '2~3cm 정도 발목 쪽으로 이동한 위치에서 다른 압통점을 찾아 반복한다.'
+      ],
+      variants: [
+        {
+          title: '쉬운 장딴지 압박 흔들기 체조',
+          sub: '65세 이상에게 추천',
+          steps: [
+            '의자에 앉아서 무릎 통증이 있는 쪽 장딴지를 다른 쪽 다리의 무릎 접시뼈 위에 얹는다.',
+            '무릎 접시뼈를 장딴지에 대고 접시뼈로 장딴지를 압박한다. 압통점이 발견되면 접시뼈로 장딴지를 압박하면서 발목을 구부렸다 펴기를 10회 반복한다.',
+            '장딴지를 압박하는 위치를 발목 쪽으로 2~3 센티미터 정도 옮겨서 다른 압통점에서도 똑같이 반복한다.'
+          ]
+        }
+      ]
+    },
+    '안쪽 허벅지 개선형': {
+      timed: false, setInfo: '아침 저녁 2세트씩',
+      steps: [
+        '의자에 앉아서 무릎 통증이 있는 쪽 다리를 한 발짝 앞으로 내민다. 무릎의 접시뼈 내측에 있는 튀어나온 뼈 근처에 양손 엄지를 대고 손가락 끝으로 누른다.',
+        '통증이 저릿하게 울리는 압통점이 발견되면 그 부분을 손가락으로 누르면서 발목을 구부렸다 펴기를 반복한다.'
+      ]
+    },
+    '바깥 허벅지 개선형': {
+      timed: false, setInfo: '아침 저녁 2세트씩',
+      steps: [
+        '무릎의 접시뼈 바깥쪽에 있는 튀어나온 뼈 주위에 양손 엄지를 대고 손가락을 누른다.',
+        '압통점이 발견되면 그 부분을 손가락으로 누르면서 발목 구부렸다 폈다를 반복한다.',
+        '압박하는 부위를 허벅지 뒤쪽 중앙부까지 조금씩 옮겨가면서 다른 압통점에서도 같은 동작을 반복한다.'
+      ]
+    },
+    '허벅지 뒤 개선형': {
+      timed: false, setInfo: '아침 저녁 2세트씩',
+      steps: [
+        '테니스공을 1개 준비하여 의자에 깊숙이 앉는다. (테니스공이 없으면 비슷한 구형 물체로도 괜찮아요.)',
+        '무릎 뒤 약간 위쪽에 테니스공을 대고 천천히 체중을 싣는다.',
+        '테니스공에 체중을 실은 채 무릎을 흔든다.',
+        '테니스공을 허벅지 뒤 중앙부까지 조금씩 옮겨 가면서 다른 압통점에서도 같은 동작을 한다.'
+      ]
+    }
+  };
+
+  // ---- 다음 스트레칭 알람 ----
+  var STRETCH_ALARM_KEY = 'sappun_stretch_alarm';
+
+  function computeAlarmIntervalHours(entry){
+    if (!entry) return null;
+    if (entry.timed) {
+      if (severityIndex === 2) return null; // 통증 '상'은 체조 대신 병원 진찰을 권하는 경우라 알람을 만들지 않는다.
+      return severityIndex === 1 ? 3 : 5.5;
+    }
+    return 12; // 아침/저녁 하루 2세트형 체조는 약 12시간 간격으로 대체.
+  }
+
+  function formatIntervalLabel(hours){
+    if (hours === 5.5) return '5~6시간';
+    if (hours === Math.round(hours)) return hours + '시간';
+    return hours + '시간';
+  }
+
+  function formatClockTime(ts){
+    try {
+      return new Date(ts).toLocaleTimeString('ko-KR', { hour: 'numeric', minute: '2-digit' });
+    } catch (e) {
+      return '';
+    }
+  }
+
+  function loadAlarmState(){
+    try {
+      var raw = localStorage.getItem(STRETCH_ALARM_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function saveAlarmState(state){
+    try {
+      if (state) localStorage.setItem(STRETCH_ALARM_KEY, JSON.stringify(state));
+      else localStorage.removeItem(STRETCH_ALARM_KEY);
+    } catch (e) { /* 저장을 못해도 이번 세션 알람은 그대로 동작한다 */ }
+  }
+
+  function clearAlarmTimer(){
+    if (alarmIntervalHandle) {
+      clearTimeout(alarmIntervalHandle);
+      alarmIntervalHandle = null;
+    }
+  }
+
+  function setAlarmStatus(text, kind){
+    var el = byId('alarm-status');
+    if (!text) {
+      el.hidden = true;
+      el.textContent = '';
+      el.className = 'alarm-status';
+      return;
+    }
+    el.hidden = false;
+    el.textContent = text;
+    el.className = 'alarm-status' + (kind ? ' ' + kind : '');
+  }
+
+  function scheduleNextAlarm(state){
+    clearAlarmTimer();
+    var delay = Math.max(1000, state.nextFireAt - Date.now());
+    alarmIntervalHandle = setTimeout(function(){ fireStretchAlarm(state); }, delay);
+    setAlarmStatus('⏰ \'' + (state.type || '추천 스트레칭') + '\' 알림이 ' + formatIntervalLabel(state.intervalHours) + '마다 울려요 · 다음 알림 ' + formatClockTime(state.nextFireAt) + ' 예정이에요. (이 페이지를 열어둔 동안에만 울려요)', 'active');
+    var btn = byId('btn-set-stretch-alarm');
+    if (btn) btn.textContent = '알람 끄기';
+  }
+
+  function fireStretchAlarm(state){
+    try {
+      if (window.Notification && Notification.permission === 'granted') {
+        new Notification('사뿐 · 스트레칭 알림', {
+          body: '\'' + (state.type || '추천 스트레칭') + '\' 할 시간이에요. 사뿐으로 돌아와 확인해보세요.',
+          tag: 'sappun-stretch-alarm'
+        });
+      }
+    } catch (e) { /* 알림 생성에 실패해도 다음 알람은 계속 예약한다 */ }
+    state.nextFireAt = Date.now() + state.intervalHours * 3600000;
+    saveAlarmState(state);
+    scheduleNextAlarm(state);
+  }
+
+  function refreshAlarmUI(){
+    var entry = STRETCHES[selectedType];
+    var hours = computeAlarmIntervalHours(entry);
+    var btn = byId('btn-set-stretch-alarm');
+    if (hours === null) {
+      btn.hidden = true;
+      setAlarmStatus(null);
+      return;
+    }
+    btn.hidden = false;
+    var state = loadAlarmState();
+    if (state && state.enabled) {
+      btn.textContent = '알람 끄기';
+      setAlarmStatus('⏰ \'' + (state.type || '추천 스트레칭') + '\' 알림이 ' + formatIntervalLabel(state.intervalHours) + '마다 울려요 · 다음 알림 ' + formatClockTime(state.nextFireAt) + ' 예정이에요. (이 페이지를 열어둔 동안에만 울려요)', 'active');
+    } else {
+      btn.textContent = '다음 스트레칭 알람 설정하기';
+      setAlarmStatus(null);
+    }
+  }
+
+  function buildFrequencyLine(entry){
+    if (entry.timed) {
+      if (severityIndex === 2) return '지금은 체조보다 병원 진찰을 먼저 받아보세요.';
+      var interval = severityIndex === 1 ? '3시간' : '5~6시간';
+      return entry.setInfo + ' / ' + interval + ' 간격';
+    }
+    return entry.setInfo;
+  }
+
+  function stepsToHtml(steps){
+    return '<ol>' + steps.map(function(s){ return '<li>' + s + '</li>'; }).join('') + '</ol>';
+  }
+  function stepsToText(steps){
+    return steps.map(function(s, i){ return (i + 1) + '. ' + s; }).join('\n');
+  }
+
+  function renderGymResult(){
+    var entry = STRETCHES[selectedType];
+    byId('gym-result-title').textContent = selectedType || '';
+    var body = byId('gym-result-body');
+    body.innerHTML = '';
+    if (!entry) {
+      body.innerHTML = '<p class="hint">추천할 스트레칭 정보를 찾지 못했어요.</p>';
+      gymResultCopyText = '';
+      refreshAlarmUI();
+      return;
+    }
+
+    var textLines = [selectedType, ''];
+    var html = '';
+
+    if (severityIndex === 2) {
+      html += '<p class="caution-line severe">앉았다 일어나기 힘들 정도의 통증이라고 답하셨어요. 지금은 체조보다 병원 진찰을 먼저 받아보시길 권해요. 아래 내용은 참고용으로만 봐주세요.</p>';
+      textLines.push('[주의] 앉았다 일어나기 힘들 정도의 통증 — 체조보다 병원 진찰을 먼저 받으세요.', '');
+    }
+
+    var freqLine = buildFrequencyLine(entry);
+    html += '<p class="severity-banner">' + freqLine + '</p>';
+    textLines.push(freqLine, '');
+
+    html += '<div class="card big-instructions">' + stepsToHtml(entry.steps) + '</div>';
+    textLines.push(stepsToText(entry.steps));
+
+    if (entry.caution) {
+      html += '<p class="caution-line">주의 사항: ' + entry.caution + '</p>';
+      textLines.push('', '주의 사항: ' + entry.caution);
+    }
+
+    var hasEasyVariant = false;
+    if (entry.variants && entry.variants.length) {
+      entry.variants.forEach(function(v){
+        if (v.sub && v.sub.indexOf('65세') !== -1) hasEasyVariant = true;
+        html += '<div class="variant-block"><span class="variant-title">' + v.title + '</span>';
+        if (v.sub) html += '<span class="variant-sub">' + v.sub + '</span>';
+        html += '<div class="big-instructions">' + stepsToHtml(v.steps) + '</div></div>';
+        textLines.push('', v.title + (v.sub ? ' (' + v.sub + ')' : ''), stepsToText(v.steps));
+      });
+    }
+
+    var cautions = [];
+    if (currentProfile && currentProfile.birthYear) {
+      var age = CURRENT_YEAR - currentProfile.birthYear;
+      if (age >= 65) {
+        cautions.push('65세 이상이신 만큼 무리하지 않는 범위에서 천천히 진행해주세요.' + (hasEasyVariant ? ' 위의 \'쉬운\' 버전부터 시작하는 것도 좋아요.' : ''));
+      }
+    }
+    if (currentProfile && currentProfile.jointReplacement) {
+      cautions.push('인공관절 수술 이력이 있다고 응답하셨어요. 체조 전에 주치의와 상담해주세요.');
+    }
+    if (currentProfile && currentProfile.conditions && currentProfile.conditions.trim()) {
+      cautions.push('지병(' + currentProfile.conditions.trim() + ')이 있다고 응답하셨어요. 체조 전에 주치의와 상담하는 것이 안전해요.');
+    }
+    cautions.forEach(function(c){
+      html += '<p class="caution-line">' + c + '</p>';
+      textLines.push('', c);
+    });
+
+    body.innerHTML = html;
+    gymResultCopyText = textLines.join('\n');
+
+    refreshAlarmUI();
+    savePainAssessment();
+  }
+
+  function savePainAssessment(){
+    if (!currentCode || !selectedType) return;
+    ensureDb().then(function(store){
+      if (!store) return;
+      return store.collection('users/' + currentCode + '/painAssessments').add({
+        date: new Date().toISOString().slice(0, 10),
+        recordedAt: Date.now(),
+        severity: ['하', '중', '상'][severityIndex],
+        type: selectedType
+      });
+    }).catch(function(){ /* 저장 실패해도 결과 화면은 그대로 보여준다 */ });
+  }
+
+  (function resumeAlarmOnLoad(){
+    var state = loadAlarmState();
+    if (state && state.enabled && window.Notification && Notification.permission === 'granted') {
+      scheduleNextAlarm(state);
+    }
+  })();
+
+  show('view-start', { silent: true });
+})();
+</script>

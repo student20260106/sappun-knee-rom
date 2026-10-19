@@ -1,4 +1,5 @@
 <title>사뿐</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Gowun+Dodum&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
@@ -722,6 +723,34 @@
   @media (max-width: 380px){
     .hero h1{ font-size: 2.2rem; }
     .code-display .code{ font-size: 1.6rem; letter-spacing: .1em; }
+  }
+
+  /* ---- 노트북/데스크톱처럼 넓은 화면: 휴대폰 폭에 고정하지 않고, 화면 가운데에
+     카드 형태로 띄워서 자연스러운 배율로 보이게 한다. 아래 두 단계(태블릿·랩탑)만
+     추가되고, 기존 휴대폰 레이아웃은 그대로 유지된다. ---- */
+  @media (min-width: 720px){
+    body{ background: var(--surface-2); }
+    .app-shell{
+      max-width: 520px;
+      margin-block: 40px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 32px;
+      box-shadow: 0 40px 90px -48px hsl(var(--shadow) / .55);
+    }
+  }
+
+  @media (min-width: 1100px){
+    .app-shell{
+      max-width: 600px;
+      margin-block: 56px;
+      padding-block: 32px 60px;
+    }
+    .hero{ padding-block: 72px 16px; }
+    .hero h1{ font-size: 3.2rem; }
+    .hero p{ font-size: 1.05rem; max-width: 34ch; }
+    button.btn{ font-size: 1.05rem; padding: 16px 24px; min-height: 52px; }
+    .view-title{ font-size: 1.7rem; }
   }
 </style>
 

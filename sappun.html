@@ -950,7 +950,13 @@
           <span id="device-status">측정기에 연결하는 중…</span>
         </div>
         <div class="readout" id="device-readout" hidden></div>
-        <p class="demo-note">지금은 데모 화면이에요. 실제 ROM 측정기(허벅지·정강이 IMU 센서)와의 연동은 다음 단계에서 이어서 구현돼요.</p>
+        <p class="demo-note" id="device-demo-note">지금은 데모 화면이에요. 실제 ROM 측정기(허벅지·정강이 IMU 센서)와의 연동은 다음 단계에서 이어서 구현돼요.</p>
+      </div>
+
+      <div class="btn-col" id="serial-connect-col" hidden>
+        <button class="btn btn-primary" id="btn-connect-serial" type="button">실제 측정기(USB)로 연결하기</button>
+        <button class="btn btn-ghost" id="btn-zero-serial" type="button" hidden>다리 펴고 0도로 보정하기</button>
+        <button class="btn btn-ghost" id="btn-use-demo" type="button">데모로 체험해보기</button>
       </div>
 
       <button class="btn btn-primary" id="btn-measure-extension" type="button" hidden>신전 가능 범위 측정하기</button>
@@ -1227,6 +1233,7 @@
   var currentCode = null;
   var deviceTimer = null;
   var liveMeasureTimer = null;
+  var serialReadoutTimer = null;
   var resultRedirectTimer = null;
   var lastMeasurement = null;
   var currentStepIndex = 0;
@@ -1244,9 +1251,13 @@
     var leaving = navStack.length ? navStack[navStack.length - 1] : null;
     if (id !== 'view-measure-device' && leaving === 'view-measure-device') {
       stopDeviceDemo();
+      stopSerialReadout();
     }
     if (id !== 'view-measure-live' && leaving === 'view-measure-live') {
       stopLiveMeasurement();
+    }
+    if (id === 'view-start' && SerialLink.isConnected()) {
+      SerialLink.disconnect();
     }
     VIEWS.forEach(function(v){ byId(v).hidden = (v !== id); });
     topbar.hidden = (id === 'view-start');
@@ -1295,6 +1306,45 @@
 
   byId('btn-begin-device').addEventListener('click', function(){
     show('view-measure-device');
+    if (SerialLink.isSupported()) {
+      byId('device-status').textContent = '실제 측정기로 연결하거나, 데모로 체험해볼 수 있어요.';
+      byId('device-readout').hidden = true;
+      byId('device-demo-note').hidden = true;
+      byId('serial-connect-col').hidden = false;
+      byId('btn-connect-serial').hidden = false;
+      byId('btn-zero-serial').hidden = true;
+      byId('btn-measure-extension').hidden = true;
+    } else {
+      byId('serial-connect-col').hidden = true;
+      byId('device-demo-note').hidden = false;
+      startDeviceDemo();
+    }
+  });
+
+  byId('btn-connect-serial').addEventListener('click', function(){
+    var statusEl = byId('device-status');
+    statusEl.textContent = '연결할 포트를 선택해주세요…';
+    SerialLink.connect().then(function(){
+      statusEl.textContent = '측정기에 연결됐어요. 다리를 펴고 0도로 보정해주세요.';
+      byId('btn-connect-serial').hidden = true;
+      byId('btn-zero-serial').hidden = false;
+      startSerialReadout();
+    }).catch(function(err){
+      statusEl.textContent = '연결에 실패했어요. 포트를 다시 선택해주세요.';
+    });
+  });
+
+  byId('btn-zero-serial').addEventListener('click', function(){
+    SerialLink.sendZero();
+    byId('device-status').textContent = '0도로 보정했어요. 이제 측정을 시작할 수 있어요.';
+    byId('btn-measure-extension').hidden = false;
+  });
+
+  byId('btn-use-demo').addEventListener('click', function(){
+    SerialLink.disconnect();
+    stopSerialReadout();
+    byId('serial-connect-col').hidden = true;
+    byId('device-demo-note').hidden = false;
     startDeviceDemo();
   });
 
@@ -1760,6 +1810,106 @@
     }
   }
 
+  // ---- 실제 측정기 연결 (Web Serial API, GitHub Pages 전용) ----
+  // 사뿐 앱은 Claude 아티팩트 안에서도 열릴 수 있는데, 그 샌드박스에서는
+  // navigator.serial 자체가 아예 존재하지 않는다. 그래서 isSupported()가
+  // false를 돌려주는 환경(아티팩트·Web Serial 미지원 브라우저)에서는 항상
+  // 기존 데모 체험으로 자연스럽게 빠지고, 실제 USB 연결 UI는 아예 노출되지 않는다.
+  var SerialLink = (function(){
+    var port = null, reader = null, writer = null, connected = false;
+    var latestAngle = null, lastAngleAt = 0, lineBuffer = '';
+
+    function isSupported(){
+      return !!(window.navigator && navigator.serial);
+    }
+
+    function connect(){
+      if (!isSupported()) return Promise.reject(new Error('Web Serial not supported'));
+      return navigator.serial.requestPort().then(function(p){
+        port = p;
+        return port.open({ baudRate: 115200 });
+      }).then(function(){
+        connected = true;
+        writer = port.writable.getWriter();
+        readLoop();
+        return true;
+      });
+    }
+
+    function readLoop(){
+      var decoder = new TextDecoderStream();
+      port.readable.pipeTo(decoder.writable).catch(function(){});
+      reader = decoder.readable.getReader();
+      function pump(){
+        return reader.read().then(function(result){
+          if (result.done) return;
+          lineBuffer += result.value;
+          var lines = lineBuffer.split('\n');
+          lineBuffer = lines.pop();
+          for (var i = 0; i < lines.length; i++) handleLine(lines[i].trim());
+          return pump();
+        }).catch(function(){});
+      }
+      pump();
+    }
+
+    function handleLine(line){
+      var m = /^ANGLE:(-?\d+(\.\d+)?)/.exec(line);
+      if (m) {
+        latestAngle = parseFloat(m[1]);
+        lastAngleAt = performance.now();
+      }
+    }
+
+    function sendZero(){
+      if (writer) {
+        try { writer.write(new TextEncoder().encode('z')); } catch(e){}
+      }
+    }
+
+    function disconnect(){
+      connected = false;
+      try { if (reader) reader.cancel(); } catch(e){}
+      try { if (writer) writer.close(); } catch(e){}
+      try { if (port) port.close(); } catch(e){}
+      port = null; reader = null; writer = null;
+      latestAngle = null; lineBuffer = '';
+    }
+
+    return {
+      isSupported: isSupported,
+      connect: connect,
+      disconnect: disconnect,
+      sendZero: sendZero,
+      isConnected: function(){ return connected; },
+      getLatestAngle: function(){ return latestAngle; },
+      getAgeMs: function(){ return latestAngle === null ? Infinity : (performance.now() - lastAngleAt); }
+    };
+  })();
+
+  // 연결 직후 "측정기와 연결하고 있어요" 화면에서 실시간 각도를 보여주는 간단한
+  // 읽기 전용 표시 — 데모의 readout과 같은 자리를 공유한다.
+  function startSerialReadout(){
+    var readoutEl = byId('device-readout');
+    readoutEl.hidden = false;
+    stopSerialReadout();
+    serialReadoutTimer = setInterval(function(){
+      var angle = SerialLink.getLatestAngle();
+      if (angle === null || SerialLink.getAgeMs() > 2000) {
+        readoutEl.textContent = '센서 값을 기다리는 중…';
+      } else {
+        readoutEl.textContent = '측정된 각도: ' + angle.toFixed(1) + '°';
+      }
+    }, 200);
+  }
+
+  function stopSerialReadout(){
+    if (serialReadoutTimer) {
+      clearInterval(serialReadoutTimer);
+      serialReadoutTimer = null;
+    }
+  }
+
   // ---- 신전 범위 측정: 안내 캐러셀 ----
   var FIGURE_READY =
     '<figure class="step-figure"><svg viewBox="0 0 220 170" role="img" aria-label="허벅지는 바닥과 평행, 무릎과 종아리 사이는 90도를 이루는 준비 자세">' +
@@ -1871,13 +2021,20 @@ var recentOmegas = [];
 var phaseSamples = [];
 
 function tick(){
-// ---- 데모 시뮬레이션: 실제로는 이 블록이 IMU에서 읽은 θ 값으로 대체된다 ----
+var theta;
+if (SerialLink.isConnected() && SerialLink.getLatestAngle() !== null && SerialLink.getAgeMs() < 1000) {
+// ---- 실제 측정기(USB) 연동: IMU 두 개에서 계산된 θ 값을 그대로 사용 ----
+theta = SerialLink.getLatestAngle();
+currentTheta = theta;
+} else {
+// ---- 데모 시뮬레이션 (실제 측정기 미연결 시 사용) ----
 // 사람이 실제로 움직일 수 있는 속도만큼만(샘플당 최대 각도 변화를 제한) 목표
 // 각도로 다가가게 해서, 각속도가 비현실적으로 튀지 않고 서서히 잦아들게 한다.
 var diff = target - currentTheta;
 var step = Math.max(-6, Math.min(6, diff * 0.5));
 currentTheta += step + (Math.random() - 0.5) * 0.6;
-var theta = currentTheta;
+theta = currentTheta;
+}
 // ---------------------------------------------------------------------
 
 var now = performance.now();

@@ -1,0 +1,25 @@
+{
+  "name": "사뿐 - 무릎 ROM 측정",
+  "short_name": "사뿐",
+  "description": "무릎 ROM을 측정하고 통증 유형에 맞는 스트레칭을 추천하는 앱",
+  "start_url": "./sappun.html",
+  "scope": "./",
+  "display": "standalone",
+  "lang": "ko",
+  "background_color": "#1b2a29",
+  "theme_color": "#2b5f54",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

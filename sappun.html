@@ -956,6 +956,7 @@
       <div class="btn-col" id="serial-connect-col" hidden>
         <button class="btn btn-primary" id="btn-connect-serial" type="button">실제 측정기(USB)로 연결하기</button>
         <button class="btn btn-ghost" id="btn-zero-serial" type="button" hidden>다리 펴고 0도로 보정하기</button>
+        <button class="btn btn-ghost" id="btn-ninety-serial" type="button" hidden>앉은 자세(90°)로 보정하기</button>
         <button class="btn btn-ghost" id="btn-use-demo" type="button">데모로 체험해보기</button>
       </div>
 
@@ -1313,6 +1314,7 @@
       byId('serial-connect-col').hidden = false;
       byId('btn-connect-serial').hidden = false;
       byId('btn-zero-serial').hidden = true;
+      byId('btn-ninety-serial').hidden = true;
       byId('btn-measure-extension').hidden = true;
     } else {
       byId('serial-connect-col').hidden = true;
@@ -1325,9 +1327,10 @@
     var statusEl = byId('device-status');
     statusEl.textContent = '연결할 포트를 선택해주세요…';
     SerialLink.connect().then(function(){
-      statusEl.textContent = '측정기에 연결됐어요. 다리를 펴고 0도로 보정해주세요.';
+      statusEl.textContent = '측정기에 연결됐어요. 아래 두 방법 중 하나로 보정해주세요.';
       byId('btn-connect-serial').hidden = true;
       byId('btn-zero-serial').hidden = false;
+      byId('btn-ninety-serial').hidden = false;
       startSerialReadout();
     }).catch(function(err){
       var name = (err && err.name) || '';
@@ -1343,7 +1346,13 @@
 
   byId('btn-zero-serial').addEventListener('click', function(){
     SerialLink.sendZero();
-    byId('device-status').textContent = '0도로 보정했어요. 이제 측정을 시작할 수 있어요.';
+    byId('device-status').textContent = '다리를 편 상태를 0도로 보정했어요. 이제 측정을 시작할 수 있어요.';
+    byId('btn-measure-extension').hidden = false;
+  });
+
+  byId('btn-ninety-serial').addEventListener('click', function(){
+    SerialLink.sendNinety();
+    byId('device-status').textContent = '지금 자세를 90도로 보정했어요. 이제 측정을 시작할 수 있어요.';
     byId('btn-measure-extension').hidden = false;
   });
 
@@ -1874,6 +1883,12 @@
       }
     }
 
+    function sendNinety(){
+      if (writer) {
+        try { writer.write(new TextEncoder().encode('n')); } catch(e){}
+      }
+    }
+
     function disconnect(){
       connected = false;
       try { if (reader) reader.cancel(); } catch(e){}
@@ -1888,6 +1903,7 @@
       connect: connect,
       disconnect: disconnect,
       sendZero: sendZero,
+      sendNinety: sendNinety,
       isConnected: function(){ return connected; },
       getLatestAngle: function(){ return latestAngle; },
       getAgeMs: function(){ return latestAngle === null ? Infinity : (performance.now() - lastAngleAt); }
@@ -1999,7 +2015,8 @@ var SAMPLE_INTERVAL_MS = 120;      // θ(t) 샘플링 주기
 var SETTLE_WINDOW_SAMPLES = 5;     // 각속도가 이만큼 연속으로 임계값 밑이면 '정지'로 판단
 var SETTLE_OMEGA_THRESHOLD = 4;    // deg/s — 이 밑이면 거의 안 움직이는 것으로 본다
 var MIN_PHASE_SAMPLES = 6;         // 최소 샘플 수 (너무 빨리 끝나는 것 방지)
-var MAX_PHASE_MS = 12000;          // 혹시 모를 무한 대기를 막는 안전장치
+var MIN_PHASE_MS = 7000;           // 한 동작(펴기/굽히기)에 최소 이만큼의 시간을 준다
+var MAX_PHASE_MS = 15000;          // 혹시 모를 무한 대기를 막는 안전장치
 var ROM_REFERENCE = { extension: 0, flexion: 135 }; // AAOS/CDC 기준 정상 가동범위 참고치
 
 var liveSamples = [];   // 반복(phase)별 요약: { extending, peakTheta, peakOmega }
@@ -2060,7 +2077,8 @@ if (recentOmegas.length > SETTLE_WINDOW_SAMPLES) recentOmegas.shift();
 // 각속도 ω(t)가 일정 구간 동안 거의 0으로 판단되면(=IMU 센서 사이 각도 변화가
 // 더 이상 없으면) 다음 동작으로 넘어간다. 고정된 시간 대신 실제 움직임이
 // 멈췄는지로 판단하므로, 사람마다 다른 속도에 자연스럽게 맞춰진다.
-var settled = phaseSamples.length >= MIN_PHASE_SAMPLES &&
+var settled = (now - phaseStart) >= MIN_PHASE_MS &&
+phaseSamples.length >= MIN_PHASE_SAMPLES &&
 recentOmegas.length >= SETTLE_WINDOW_SAMPLES &&
 recentOmegas.every(function(w){ return w < SETTLE_OMEGA_THRESHOLD; });
 var timedOut = (now - phaseStart) >= MAX_PHASE_MS;

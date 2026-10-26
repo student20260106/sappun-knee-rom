@@ -653,6 +653,7 @@
   /* ---- 유형 진단 워크스루 (안내 캐러셀과 스타일 공유) ---- */
   .test-category-label{ font-family: var(--font-mono); font-size: .78rem; color: var(--accent-strong); }
   .test-move{ font-family: var(--font-display); font-size: 1.3rem; font-weight: 700; color: var(--ink); margin: 0; }
+  .test-type-label{ align-self: flex-start; font-size: .88rem; font-weight: 500; color: var(--accent-ink); background: var(--accent-soft); border-radius: 999px; padding: 6px 14px; }
 
   /* ---- 나의 통증 유형은? ---- */
   .type-group{ display: flex; flex-direction: column; gap: 8px; }
@@ -1152,6 +1153,7 @@
         <span class="step-num" id="test-num"></span>
         <span class="test-category-label" id="test-category-label" hidden></span>
         <p class="test-move" id="test-move" hidden></p>
+        <span class="test-type-label" id="test-type-label" hidden></span>
         <p id="test-text"></p>
       </div>
 
@@ -2445,6 +2447,7 @@ show('view-measure-result');
 
     if (card.kind === 'title') {
       byId('test-category-label').hidden = true;
+      byId('test-type-label').hidden = true;
       byId('test-move').hidden = false;
       byId('test-move').textContent = card.category.title;
       byId('test-text').textContent = card.category.intro;
@@ -2453,6 +2456,8 @@ show('view-measure-result');
       byId('test-category-label').textContent = card.category.title;
       byId('test-move').hidden = false;
       byId('test-move').textContent = card.move;
+      byId('test-type-label').hidden = false;
+      byId('test-type-label').textContent = '진단명 · ' + card.type;
       var action = card.category.palpation ? '누른 후' : '동작 전후로';
       byId('test-text').textContent = action + ' 통증의 강도, 움직일 수 있는 범위, 걷기 편한 정도를 비교해보세요. 좋아졌다면 이 동작이 원인일 가능성이 높아요.';
     }
